@@ -4,7 +4,82 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- Puoi aggiungere il tuo style.css, o inserire qui i tuoi stili -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f0f0f0;
+    }
+    header {
+      background-color: #1976d2;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
+    section {
+      background-color: #fff;
+      margin: 1rem auto;
+      padding: 1rem;
+      max-width: 800px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .riga-dati,
+    .riga-giornaliera {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+    label {
+      font-weight: bold;
+      min-width: max-content;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      padding: 0.3rem 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    #riepilogo-table tbody tr:hover {
+      background-color: #fafafa;
+    }
+    button {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover { opacity: 0.9; }
+    #totale-settimanale {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    #esporta-stampa {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+  </style>
+
 </head>
 <body>
 
@@ -12,40 +87,36 @@
     <h1>Nota Spese Trasferta</h1>
   </header>
 
-  <!-- SEZIONE DATI PRINCIPALI -->
-  <section id="sezione-dati-principali">
+  <!-- DATI GENERALI -->
+  <section>
     <div class="riga-dati">
-      <!-- Dipendente -->
       <label for="dipendente">Dipendente:</label>
-      <input type="text" id="dipendente" placeholder="Inserisci nome dipendente" />
+      <input type="text" id="dipendente" placeholder="Nome dipendente">
 
-      <!-- Targa Automezzo -->
       <label for="targa">Targa Automezzo:</label>
-      <input type="text" id="targa" placeholder="Inserisci targa automezzo" />
+      <input type="text" id="targa" placeholder="Targa automezzo">
 
-      <!-- Numero Settimana -->
-      <label for="numero-settimana">Numero Settimana:</label>
-      <input type="number" id="numero-settimana" min="1" max="52" placeholder="Es. 12" />
-      <!-- Quando cambia, carica i dati da localStorage (vedi app.js) -->
+      <!-- Numero Settimana (calcolato automaticamente) -->
+      <label for="numero-settimana">Settimana ISO:</label>
+      <input type="text" id="numero-settimana" readonly>
     </div>
   </section>
 
-  <!-- SEZIONE INSERIMENTO SPESE GIORNALIERE -->
-  <section id="inserimento-spese">
-    <h2>Inserisci / Modifica voce spesa</h2>
-
+  <!-- INSERIMENTO VOCE -->
+  <section>
+    <h2>Inserisci Voce</h2>
     <div class="riga-giornaliera">
       <!-- Data -->
       <label for="data-giorno">Data:</label>
-      <input type="date" id="data-giorno" />
+      <input type="date" id="data-giorno">
 
-      <!-- Giorno (auto) -->
+      <!-- Giorno (calcolato) -->
       <label for="giorno-settimana">Giorno:</label>
-      <input type="text" id="giorno-settimana" readonly />
+      <input type="text" id="giorno-settimana" readonly>
 
-      <!-- Descrizione libero (ad es. "Sede", "Lombardia", ecc.) -->
+      <!-- Descrizione libera -->
       <label for="descrizione-giorno">Descrizione Giorno:</label>
-      <input type="text" id="descrizione-giorno" placeholder="Es. Sede, Trasferta, etc." />
+      <input type="text" id="descrizione-giorno" placeholder="Esempio: Sede, Trasferta, ecc.">
 
       <!-- Categoria -->
       <label for="categoria">Categoria:</label>
@@ -62,60 +133,50 @@
         <option value="">-- Sottocategoria --</option>
       </select>
 
-      <!-- Importo / Valore -->
-      <label for="importo">Valore:</label>
-      <input type="number" id="importo" step="1" placeholder="0" />
-      <!-- step="1" perché i km sono numeri interi, ma puoi adattare se serve virgola. -->
-
-      <!-- Pulsante per aggiungere / modificare -->
-      <button id="aggiungi-voce">Aggiungi Voce</button>
-      <!-- In app.js, se stiamo modificando una riga esistente, questo bottone farà un “salvataggio modifica” -->
+      <!-- Valore (Km o Importo) -->
+      <label for="valore-voce">Valore:</label>
+      <input type="number" id="valore-voce" placeholder="0">
+      
+      <!-- Pulsante Aggiungi -->
+      <button id="aggiungi-voce">Aggiungi</button>
     </div>
   </section>
 
-  <!-- SEZIONE RIEPILOGO -->
-  <section id="riepilogo-sezione">
-    <h2>Riepilogo Spese</h2>
-    <!-- Tabella / container per tutte le voci inserite -->
+  <!-- RIEPILOGO -->
+  <section>
+    <h2>Riepilogo</h2>
     <table id="riepilogo-table">
       <thead>
         <tr>
           <th>Data</th>
           <th>Giorno</th>
-          <th>Descrizione</th>
+          <th>Descriz.</th>
           <th>Categoria</th>
           <th>SottoCat</th>
           <th>Valore</th>
-          <th>Tot. Km Giornalieri</th>
+          <th>Km Tot (stesso giorno)</th>
           <th>Azioni</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Popolato da app.js -->
-      </tbody>
+      <tbody></tbody>
     </table>
 
     <div id="totale-settimanale">
-      <strong>Totale settimana (solo spese in €):</strong> <span id="somma-settimanale">0</span>
+      Totale Spese (no Km): <span id="somma-settimanale">0.00</span>
     </div>
   </section>
 
   <!-- NOTE E FIRME -->
-  <section id="sezione-note-firme">
-    <div class="note-container">
+  <section>
+    <div class="riga-dati">
       <label for="note">Note:</label>
-      <textarea id="note" rows="3" placeholder="Eventuali annotazioni..."></textarea>
+      <textarea id="note" rows="2" style="flex:1;"></textarea>
     </div>
-
-    <div id="firme">
-      <div class="firma">
-        <label for="firma-direzione">Visto Direzione</label>
-        <input type="text" id="firma-direzione" placeholder="Firma Direzione" />
-      </div>
-      <div class="firma">
-        <label for="firma-dipendente">Firma Dipendente</label>
-        <input type="text" id="firma-dipendente" placeholder="Firma Dipendente" />
-      </div>
+    <div class="riga-dati">
+      <label for="firma-direzione">Visto Direzione:</label>
+      <input type="text" id="firma-direzione" placeholder="Firma Direzione">
+      <label for="firma-dipendente">Firma Dipendente:</label>
+      <input type="text" id="firma-dipendente" placeholder="Firma Dipendente">
     </div>
   </section>
 
