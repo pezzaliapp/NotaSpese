@@ -1,0 +1,82 @@
+/* style.css */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+header {
+  background-color: #2196f3;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+main {
+  padding: 1rem;
+}
+
+label {
+  display: inline-block;
+  width: 140px;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+input, select, textarea, button {
+  margin-bottom: 1rem;
+}
+
+#info-generali,
+#inserimento-spese,
+#sezione-note-firme {
+  background: #fff;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.riga-giornaliera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.giorno-container {
+  background: #f9f9f9;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+}
+
+.giorno-container h3 {
+  margin: 0;
+  margin-bottom: 0.5rem;
+}
+
+.voce-spesa {
+  margin-left: 1rem;
+}
+
+#totale-settimanale {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+#firme {
+  display: flex;
+  justify-content: space-between;
+}
+
+.firma {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+#esporta-stampa {
+  display: flex;
+  gap: 1rem;
+}
