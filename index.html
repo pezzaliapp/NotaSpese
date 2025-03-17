@@ -8,14 +8,8 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f0f0f0; }
     header { background: #1976d2; color: #fff; text-align: center; padding: 1rem; }
-    section {
-      background: #fff; margin: 1rem auto; padding: 1rem; max-width: 900px;
-      border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1);
-    }
-    .riga-dati, .riga-giornaliera {
-      display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;
-      align-items: center;
-    }
+    section { background: #fff; margin: 1rem auto; padding: 1rem; max-width: 900px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1); }
+    .riga-dati, .riga-giornaliera { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
     label { font-weight: bold; min-width: max-content; }
     input[type="text"], input[type="date"], input[type="number"], select, textarea {
       padding: 0.3rem 0.5rem; border: 1px solid #ccc; border-radius: 4px;
@@ -23,7 +17,7 @@
     button { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     table th, table td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
-    table tbody tr:hover { background: #fafafa; }
+    #riepilogo-table tbody tr:hover { background: #fafafa; }
     #totale-settimanale { margin-top: 1rem; font-weight: bold; }
     #esporta-stampa { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
   </style>
@@ -34,7 +28,7 @@
     <h1>Nota Spese Trasferta</h1>
   </header>
 
-  <!-- SEZIONE DATI SETTIMANA -->
+  <!-- SEZIONE DATI GENERALI / SETTIMANA -->
   <section>
     <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
@@ -44,20 +38,16 @@
       <input type="text" id="targa" placeholder="Targa automezzo" />
     </div>
 
-    <!-- Numero settimana e pulsanti Carica/Salva -->
     <div class="riga-dati">
       <label for="numero-settimana">N. Settimana:</label>
-      <input type="number" id="numero-settimana" min="1" max="52" placeholder="Es. 12" />
+      <input type="number" id="numero-settimana" min="1" max="52" placeholder="Es. 10" />
 
-      <!-- Pulsante Carica: recupera da localStorage -->
       <button id="carica-settimana">Carica Settimana</button>
-
-      <!-- Pulsante Salva: salva la settimana in localStorage -->
       <button id="salva-settimana">Salva Settimana</button>
     </div>
   </section>
 
-  <!-- SEZIONE INSERIMENTO VOCI -->
+  <!-- INSERIMENTO VOCI -->
   <section>
     <h2>Inserisci Voce</h2>
     <div class="riga-giornaliera">
@@ -69,15 +59,15 @@
       <label for="giorno-settimana">Giorno:</label>
       <input type="text" id="giorno-settimana" readonly />
 
-      <!-- Numero settimana (auto) -->
+      <!-- Settimana (auto) -->
       <label for="settimana-auto">Settimana (auto):</label>
       <input type="text" id="settimana-auto" readonly />
 
-      <!-- Descrizione Giorno -->
+      <!-- Descrizione -->
       <label for="descrizione-giorno">Desc. Giorno:</label>
-      <input type="text" id="descrizione-giorno" placeholder="SEDE, Trasferta, ecc." />
+      <input type="text" id="descrizione-giorno" placeholder="Sede, Trasferta, etc." />
 
-      <!-- Categoria & SottoCategoria -->
+      <!-- Categoria / Sottocategoria -->
       <label for="categoria">Categoria:</label>
       <select id="categoria">
         <option value="">-- Seleziona --</option>
@@ -91,7 +81,7 @@
         <option value="">-- Sottocategoria --</option>
       </select>
 
-      <!-- Valore (km o euro) -->
+      <!-- Valore -->
       <label for="valore-voce">Valore:</label>
       <input type="number" id="valore-voce" placeholder="0" />
 
@@ -112,11 +102,13 @@
           <th>Categoria</th>
           <th>SottoCat</th>
           <th>Valore</th>
-          <th>Km Tot (giorno)</th>
+          <th>Diff Km</th> <!-- differenza per questa riga, se Km Finali -->
           <th>Azioni</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody>
+        <!-- Popolato dinamicamente -->
+      </tbody>
     </table>
 
     <div id="totale-settimanale">
@@ -138,7 +130,7 @@
     </div>
   </section>
 
-  <!-- PULSANTI ESPORTA/STAMPA -->
+  <!-- PULSANTI ESPORTA -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
