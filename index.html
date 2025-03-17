@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nota Spese Trasferta</title>
+  <!-- Collegamento allo style.css -->
+  <link rel="stylesheet" href="style.css" />
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+  <header>
+    <h1>Nota Spese Trasferta</h1>
+  </header>
+
+  <main>
+    <!-- Sezione dati iniziali -->
+    <section id="info-generali">
+      <label for="dipendente">Dipendente:</label>
+      <input type="text" id="dipendente" placeholder="Inserisci nome dipendente" />
+
+      <label for="targa">Targa Automezzo:</label>
+      <input type="text" id="targa" placeholder="Inserisci targa automezzo" />
+
+      <label for="settimana">Numero settimana:</label>
+      <input type="number" id="settimana" min="1" max="52" placeholder="Es. 18" />
+    </section>
+
+    <!-- Sezione per giorni, date e inserimento spese -->
+    <section id="inserimento-spese">
+      <h2>Inserisci le spese giornaliere</h2>
+
+      <div class="riga-giornaliera">
+        <!-- Selezione giorno e data in base al numero settimana -->
+        <label for="data-giorno">Data:</label>
+        <input type="date" class="data-giorno" />
+
+        <label for="giorno-settimana">Giorno:</label>
+        <select class="giorno-settimana">
+          <option value="Lunedì">Lunedì</option>
+          <option value="Martedì">Martedì</option>
+          <option value="Mercoledì">Mercoledì</option>
+          <option value="Giovedì">Giovedì</option>
+          <option value="Venerdì">Venerdì</option>
+          <option value="Sabato">Sabato</option>
+          <option value="Domenica">Domenica</option>
+        </select>
+
+        <!-- Selezione categoria -->
+        <label for="categoria">Categoria:</label>
+        <select class="categoria">
+          <option value="">-- Seleziona --</option>
+          <option value="km">Km</option>
+          <option value="spese-viaggio">Spese Viaggio</option>
+          <option value="alloggio-pasti">Alloggio e Pasti</option>
+          <option value="carburante">Carburante (Carta ENI)</option>
+        </select>
+
+        <!-- Sottocategoria variabile in base alla categoria -->
+        <select class="sottocategoria">
+          <option value="">-- Sottocategoria --</option>
+        </select>
+
+        <!-- Importo -->
+        <label for="importo">Importo:</label>
+        <input type="number" class="importo" step="0.01" placeholder="0.00" />
+
+        <!-- Caricamento foto -->
+        <label for="foto">Allegato:</label>
+        <input type="file" class="foto" accept="image/*" />
+
+        <!-- Pulsante per aggiungere la riga nel riepilogo -->
+        <button class="aggiungi-voce">Aggiungi</button>
+      </div>
+
+      <!-- Riepilogo spese per giorno, con subtotali -->
+      <div id="riepilogo-giornaliero">
+        <!-- Viene popolato dinamicamente da app.js -->
+      </div>
+
+      <!-- Totale settimanale -->
+      <div id="totale-settimanale">
+        Totale settimana: <span id="somma-settimanale">0.00</span> €
+      </div>
+    </section>
+
+    <!-- Sezione note e firme -->
+    <section id="sezione-note-firme">
+      <label for="note">Note:</label>
+      <textarea id="note" rows="3" placeholder="Inserisci eventuali annotazioni..."></textarea>
+
+      <div id="firme">
+        <div class="firma">
+          <label>Visto Direzione</label>
+          <div class="firma-direzione">
+            <!-- Qui potresti gestire la firma digitale (canvas o input), oppure lasciare un campo testo -->
+            <input type="text" placeholder="Firma Direzione" />
+          </div>
+        </div>
+
+        <div class="firma">
+          <label>Firma Dipendente</label>
+          <div class="firma-dipendente">
+            <!-- Anche qui potresti fare un canvas per la firma manuale su touchscreen -->
+            <input type="text" placeholder="Firma Dipendente" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sezione pulsanti stampa/esporta -->
+    <section id="esporta-stampa">
+      <button id="stampa-txt">Stampa in TXT</button>
+      <button id="condividi-whatsapp">Invia via WhatsApp</button>
+      <!-- Se desideri fare un’anteprima di stampa con layout “tabellare” puoi aggiungere un pulsante dedicato -->
+      <button id="stampa-replica">Stampa Replica Form</button>
+    </section>
+  </main>
+
+  <!-- Script principale dell’app -->
+  <script src="app.js"></script>
+  <!-- Registrazione Service Worker (meglio alla fine del body) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
