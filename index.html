@@ -1,142 +1,150 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-  <!-- Collegamento allo style.css -->
+
+  <!-- Collegamento al foglio di stile -->
   <link rel="stylesheet" href="style.css" />
-  <!-- Manifest PWA -->
+
+  <!-- Manifest PWA (opzionale, se vuoi rendere questa app installabile) -->
+  <!--
   <link rel="manifest" href="manifest.json" />
+  -->
+
 </head>
 <body>
+
+  <!-- HEADER -->
   <header>
     <h1>Nota Spese Trasferta</h1>
-    <section>
-    <label for="data-giorno">Data:</label>
-    <input type="date" id="data-giorno" />
-
-    <label for="giorno-settimana">Giorno:</label>
-    <!-- Campo sola lettura, compilato da JS -->
-    <input type="text" id="giorno-settimana" readonly />
-
-    <label for="numero-settimana">Numero Settimana:</label>
-    <!-- Campo sola lettura, compilato da JS -->
-    <input type="text" id="numero-settimana" readonly />
-  </section>
   </header>
 
-  <main>
-    <!-- Sezione dati iniziali -->
-    <section id="info-generali">
+  <!-- SEZIONE DATI PRINCIPALI -->
+  <section id="sezione-dati-principali">
+    <!-- Data, Giorno, Numero Settimana -->
+    <div class="riga-dati">
+      <label for="data-giorno">Data:</label>
+      <input type="date" class="data-giorno" id="data-giorno" />
+
+      <label for="giorno-settimana">Giorno:</label>
+      <input type="text" class="giorno-settimana" id="giorno-settimana" readonly />
+
+      <label for="numero-settimana">Numero Settimana:</label>
+      <input type="text" class="numero-settimana" id="numero-settimana" readonly />
+    </div>
+
+    <!-- Dipendente, Targa e (volendo) un Numero Settimana "generale" -->
+    <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
       <input type="text" id="dipendente" placeholder="Inserisci nome dipendente" />
 
       <label for="targa">Targa Automezzo:</label>
       <input type="text" id="targa" placeholder="Inserisci targa automezzo" />
 
-      <label for="settimana">Numero settimana:</label>
-      <input type="number" id="settimana" min="1" max="52" placeholder="Es. 18" />
-    </section>
+      <label for="settimana-generale">Numero settimana:</label>
+      <input type="text" id="settimana-generale" placeholder="Es." />
+      <!-- Se vuoi popolare automaticamente questo anche, puoi usare la logica di app.js -->
+    </div>
+  </section>
 
-    <!-- Sezione per giorni, date e inserimento spese -->
-    <section id="inserimento-spese">
-      <h2>Inserisci le spese giornaliere</h2>
+  <!-- SEZIONE INSERIMENTO SPESE GIORNALIERE -->
+  <section id="inserimento-spese">
+    <h2>Inserisci le spese giornaliere</h2>
 
-      <div class="riga-giornaliera">
-        <!-- Selezione giorno e data in base al numero settimana -->
-        <label for="data-giorno">Data:</label>
-        <input type="date" class="data-giorno" />
+    <!-- Riga per la selezione di data/giorno/categoria/sottocategoria/importo -->
+    <div class="riga-giornaliera">
+      <!-- Data (già sopra) e Giorno e Settimana li abbiamo in testa,
+           ma se vuoi potresti duplicare un input date per ogni riga. -->
+      <label for="giorno-selezione">Giorno:</label>
+      <select class="giorno-settimana-manuale" id="giorno-selezione">
+        <!-- Se vuoi compilarlo manualmente, oppure puoi omettere questo e usare solo quello readOnly -->
+        <option value="Lunedì">Lunedì</option>
+        <option value="Martedì">Martedì</option>
+        <option value="Mercoledì">Mercoledì</option>
+        <option value="Giovedì">Giovedì</option>
+        <option value="Venerdì">Venerdì</option>
+        <option value="Sabato">Sabato</option>
+        <option value="Domenica">Domenica</option>
+      </select>
 
-        <label for="giorno-settimana">Giorno:</label>
-        <select class="giorno-settimana">
-          <option value="Lunedì">Lunedì</option>
-          <option value="Martedì">Martedì</option>
-          <option value="Mercoledì">Mercoledì</option>
-          <option value="Giovedì">Giovedì</option>
-          <option value="Venerdì">Venerdì</option>
-          <option value="Sabato">Sabato</option>
-          <option value="Domenica">Domenica</option>
-        </select>
+      <!-- Selezione Categoria -->
+      <label for="categoria">Categoria:</label>
+      <select class="categoria" id="categoria">
+        <option value="km">Km</option>
+        <option value="spese-viaggio">Spese Viaggio</option>
+        <option value="alloggio-pasti">Alloggio e Pasti</option>
+        <option value="carburante">Carburante</option>
+      </select>
 
-        <!-- Selezione categoria -->
-        <label for="categoria">Categoria:</label>
-        <select class="categoria">
-          <option value="">-- Seleziona --</option>
-          <option value="km">Km</option>
-          <option value="spese-viaggio">Spese Viaggio</option>
-          <option value="alloggio-pasti">Alloggio e Pasti</option>
-          <option value="carburante">Carburante (Carta ENI)</option>
-        </select>
+      <!-- Sottocategoria -->
+      <select class="sottocategoria" id="sottocategoria">
+        <!-- Verrà popolato da app.js -->
+        <option value="">-- Sottocategoria --</option>
+      </select>
 
-        <!-- Sottocategoria variabile in base alla categoria -->
-        <select class="sottocategoria">
-          <option value="">-- Sottocategoria --</option>
-        </select>
+      <!-- Importo -->
+      <label for="importo">Importo:</label>
+      <input type="number" class="importo" id="importo" step="0.01" placeholder="0.00" />
 
-        <!-- Importo -->
-        <label for="importo">Importo:</label>
-        <input type="number" class="importo" step="0.01" placeholder="0.00" />
+      <!-- Allegato (foto) -->
+      <label for="foto">Allegato:</label>
+      <input type="file" class="foto" id="foto" accept="image/*" />
 
-        <!-- Caricamento foto -->
-        <label for="foto">Allegato:</label>
-        <input type="file" class="foto" accept="image/*" />
+      <!-- Pulsante aggiungi -->
+      <button class="aggiungi-voce" id="aggiungi-voce">Aggiungi</button>
+    </div>
 
-        <!-- Pulsante per aggiungere la riga nel riepilogo -->
-        <button class="aggiungi-voce">Aggiungi</button>
-      </div>
+    <!-- Totale settimanale -->
+    <div id="totale-settimanale">
+      Totale settimana: <span id="somma-settimanale">0.00</span> €
+    </div>
 
-      <!-- Riepilogo spese per giorno, con subtotali -->
-      <div id="riepilogo-giornaliero">
-        <!-- Viene popolato dinamicamente da app.js -->
-      </div>
+    <!-- Riepilogo -->
+    <div id="riepilogo-giornaliero">
+      <!-- Popolato dinamicamente da app.js -->
+    </div>
+  </section>
 
-      <!-- Totale settimanale -->
-      <div id="totale-settimanale">
-        Totale settimana: <span id="somma-settimanale">0.00</span> €
-      </div>
-    </section>
-
-    <!-- Sezione note e firme -->
-    <section id="sezione-note-firme">
+  <!-- SEZIONE NOTE E FIRME -->
+  <section id="sezione-note-firme">
+    <div class="note-container">
       <label for="note">Note:</label>
       <textarea id="note" rows="3" placeholder="Inserisci eventuali annotazioni..."></textarea>
+    </div>
 
-      <div id="firme">
-        <div class="firma">
-          <label>Visto Direzione</label>
-          <div class="firma-direzione">
-            <!-- Qui potresti gestire la firma digitale (canvas o input), oppure lasciare un campo testo -->
-            <input type="text" placeholder="Firma Direzione" />
-          </div>
-        </div>
-
-        <div class="firma">
-          <label>Firma Dipendente</label>
-          <div class="firma-dipendente">
-            <!-- Anche qui potresti fare un canvas per la firma manuale su touchscreen -->
-            <input type="text" placeholder="Firma Dipendente" />
-          </div>
-        </div>
+    <!-- Firme -->
+    <div id="firme">
+      <div class="firma">
+        <label for="firma-direzione">Visto Direzione</label>
+        <input type="text" id="firma-direzione" placeholder="Firma Direzione" />
       </div>
-    </section>
+      <div class="firma">
+        <label for="firma-dipendente">Firma Dipendente</label>
+        <input type="text" id="firma-dipendente" placeholder="Firma Dipendente" />
+      </div>
+    </div>
+  </section>
 
-    <!-- Sezione pulsanti stampa/esporta -->
-    <section id="esporta-stampa">
-      <button id="stampa-txt">Stampa in TXT</button>
-      <button id="condividi-whatsapp">Invia via WhatsApp</button>
-      <!-- Se desideri fare un’anteprima di stampa con layout “tabellare” puoi aggiungere un pulsante dedicato -->
-      <button id="stampa-replica">Stampa Replica Form</button>
-    </section>
-  </main>
+  <!-- SEZIONE PULSANTI -->
+  <section id="esporta-stampa">
+    <button id="stampa-txt">Stampa in TXT</button>
+    <button id="condividi-whatsapp">Invia via WhatsApp</button>
+    <button id="stampa-replica">Stampa Replica Form</button>
+  </section>
 
-  <!-- Script principale dell’app -->
+  <!-- Script principale -->
   <script src="app.js"></script>
-  <!-- Registrazione Service Worker (meglio alla fine del body) -->
+
+  <!-- Registrazione Service Worker (opzionale, se vuoi PWA offline) -->
+  <!--
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
   </script>
+  -->
+
 </body>
 </html>
