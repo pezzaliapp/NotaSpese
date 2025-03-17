@@ -6,11 +6,16 @@
   <title>Nota Spese Trasferta</title>
 
   <style>
-    /* Stile di base, puoi sostituirlo con un file style.css */
     body { font-family: Arial, sans-serif; margin: 0; background: #f0f0f0; }
     header { background: #1976d2; color: #fff; text-align: center; padding: 1rem; }
-    section { background: #fff; margin: 1rem auto; padding: 1rem; max-width: 900px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1); }
-    .riga-dati, .riga-giornaliera { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+    section {
+      background: #fff; margin: 1rem auto; padding: 1rem; max-width: 900px;
+      border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+    .riga-dati, .riga-giornaliera {
+      display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;
+      align-items: center;
+    }
     label { font-weight: bold; min-width: max-content; }
     input[type="text"], input[type="date"], input[type="number"], select, textarea {
       padding: 0.3rem 0.5rem; border: 1px solid #ccc; border-radius: 4px;
@@ -64,13 +69,13 @@
       <label for="giorno-settimana">Giorno:</label>
       <input type="text" id="giorno-settimana" readonly />
 
-      <!-- Numero settimana auto (read-only, calcolato dalla data) -->
+      <!-- Numero settimana (auto) -->
       <label for="settimana-auto">Settimana (auto):</label>
       <input type="text" id="settimana-auto" readonly />
 
       <!-- Descrizione Giorno -->
       <label for="descrizione-giorno">Desc. Giorno:</label>
-      <input type="text" id="descrizione-giorno" placeholder="Sede, Trasferta, etc." />
+      <input type="text" id="descrizione-giorno" placeholder="SEDE, Trasferta, ecc." />
 
       <!-- Categoria & SottoCategoria -->
       <label for="categoria">Categoria:</label>
