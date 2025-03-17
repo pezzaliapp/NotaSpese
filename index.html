@@ -4,22 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f0f0f0; }
-    header { background: #1976d2; color: #fff; text-align: center; padding: 1rem; }
-    section { background: #fff; margin: 1rem auto; padding: 1rem; max-width: 900px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1); }
-    .riga-dati, .riga-giornaliera { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
-    label { font-weight: bold; min-width: max-content; }
-    input[type="text"], input[type="date"], input[type="number"], select, textarea {
-      padding: 0.3rem 0.5rem; border: 1px solid #ccc; border-radius: 4px;
+    /* Esempio di stile di base */
+    body { font-family: Arial, sans-serif; margin:0; background:#f0f0f0; }
+    header { background:#1976d2; color:#fff; text-align:center; padding:1rem; }
+    section {
+      background:#fff; margin:1rem auto; padding:1rem; max-width:900px; 
+      border-radius:6px; box-shadow:0 0 6px rgba(0,0,0,0.1);
     }
-    button { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    table th, table td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
-    #riepilogo-table tbody tr:hover { background: #fafafa; }
-    #totale-settimanale { margin-top: 1rem; font-weight: bold; }
-    #esporta-stampa { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
+    .riga-dati, .riga-giornaliera {
+      display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;
+    }
+    label { font-weight:bold; min-width:max-content; }
+    input[type="text"], input[type="date"], input[type="number"],
+    select, textarea {
+      padding:0.3rem 0.5rem; border:1px solid #ccc; border-radius:4px;
+    }
+    button {
+      padding:0.4rem 0.8rem; border:none; border-radius:4px; cursor:pointer;
+    }
+    table {
+      width:100%; border-collapse:collapse; margin-top:1rem;
+    }
+    table th, table td {
+      border:1px solid #ccc; padding:0.5rem; text-align:left;
+    }
+    table tbody tr:hover { background:#fafafa; }
+    #totale-settimanale { margin-top:1rem; font-weight:bold; }
+    #esporta-stampa {
+      display:flex; gap:1rem; justify-content:center; margin-top:1rem;
+    }
+    h2 { margin-top:0; }
   </style>
 </head>
 <body>
@@ -28,7 +43,7 @@
     <h1>Nota Spese Trasferta</h1>
   </header>
 
-  <!-- SEZIONE DATI GENERALI / SETTIMANA -->
+  <!-- SEZIONE DATI GENERALI E GESTIONE SETTIMANA -->
   <section>
     <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
@@ -47,27 +62,22 @@
     </div>
   </section>
 
-  <!-- INSERIMENTO VOCI -->
+  <!-- SEZIONE INSERIMENTO VOCI -->
   <section>
     <h2>Inserisci Voce</h2>
     <div class="riga-giornaliera">
-      <!-- Data -->
       <label for="data-giorno">Data:</label>
       <input type="date" id="data-giorno" />
 
-      <!-- Giorno (auto) -->
       <label for="giorno-settimana">Giorno:</label>
       <input type="text" id="giorno-settimana" readonly />
 
-      <!-- Settimana (auto) -->
       <label for="settimana-auto">Settimana (auto):</label>
       <input type="text" id="settimana-auto" readonly />
 
-      <!-- Descrizione -->
       <label for="descrizione-giorno">Desc. Giorno:</label>
-      <input type="text" id="descrizione-giorno" placeholder="Sede, Trasferta, etc." />
+      <input type="text" id="descrizione-giorno" placeholder="Sede, Trasferta, ecc." />
 
-      <!-- Categoria / Sottocategoria -->
       <label for="categoria">Categoria:</label>
       <select id="categoria">
         <option value="">-- Seleziona --</option>
@@ -81,38 +91,59 @@
         <option value="">-- Sottocategoria --</option>
       </select>
 
-      <!-- Valore -->
       <label for="valore-voce">Valore:</label>
       <input type="number" id="valore-voce" placeholder="0" />
 
-      <!-- Pulsante Aggiungi/Modifica -->
       <button id="aggiungi-voce">Aggiungi</button>
     </div>
   </section>
 
-  <!-- RIEPILOGO -->
+  <!-- TABELLA DI EDITING (con Azioni Modifica/Elimina) -->
   <section>
-    <h2>Riepilogo</h2>
+    <h2>Elenco Voci (per modifiche) - con Settimana</h2>
     <table id="riepilogo-table">
       <thead>
         <tr>
           <th>Data</th>
           <th>Giorno</th>
+          <th>Settimana</th>
           <th>Descrizione</th>
           <th>Categoria</th>
           <th>SottoCat</th>
           <th>Valore</th>
-          <th>Diff Km</th> <!-- differenza per questa riga, se Km Finali -->
+          <th>Diff Km</th>
           <th>Azioni</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Popolato dinamicamente -->
-      </tbody>
+      <tbody></tbody>
     </table>
 
     <div id="totale-settimanale">
       Totale Spese (no Km): <span id="somma-settimanale">0.00</span>
+    </div>
+  </section>
+
+  <!-- REPORT FINALE (raggruppato per data) -->
+  <section>
+    <h2>Report Settimanale (in ordine di data)</h2>
+    <table id="report-table">
+      <thead>
+        <tr>
+          <th>Settimana</th>
+          <th>Data</th>
+          <th>Giorno</th>
+          <th>Descrizione</th>
+          <th>Km Iniziali</th>
+          <th>Km Finali</th>
+          <th>Diff Km Giorno</th>
+          <th>Spese (subtot)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="report-totali" style="margin-top:1rem; font-weight:bold;">
+      <!-- Totale Km e Spese finali -->
     </div>
   </section>
 
@@ -130,7 +161,7 @@
     </div>
   </section>
 
-  <!-- PULSANTI ESPORTA -->
+  <!-- PULSANTI -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
