@@ -1,85 +1,27 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
 
-  <!-- Puoi aggiungere il tuo style.css, o inserire qui i tuoi stili -->
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background-color: #f0f0f0;
+    /* Stile di base, puoi sostituirlo con un file style.css */
+    body { font-family: Arial, sans-serif; margin: 0; background: #f0f0f0; }
+    header { background: #1976d2; color: #fff; text-align: center; padding: 1rem; }
+    section { background: #fff; margin: 1rem auto; padding: 1rem; max-width: 900px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1); }
+    .riga-dati, .riga-giornaliera { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+    label { font-weight: bold; min-width: max-content; }
+    input[type="text"], input[type="date"], input[type="number"], select, textarea {
+      padding: 0.3rem 0.5rem; border: 1px solid #ccc; border-radius: 4px;
     }
-    header {
-      background-color: #1976d2;
-      color: #fff;
-      text-align: center;
-      padding: 1rem;
-    }
-    section {
-      background-color: #fff;
-      margin: 1rem auto;
-      padding: 1rem;
-      max-width: 800px;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    .riga-dati,
-    .riga-giornaliera {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      align-items: center;
-    }
-    label {
-      font-weight: bold;
-      min-width: max-content;
-    }
-    input[type="text"],
-    input[type="date"],
-    input[type="number"],
-    select,
-    textarea {
-      padding: 0.3rem 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    table th, table td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-    }
-    #riepilogo-table tbody tr:hover {
-      background-color: #fafafa;
-    }
-    button {
-      padding: 0.4rem 0.8rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    button:hover { opacity: 0.9; }
-    #totale-settimanale {
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-    #esporta-stampa {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 1rem;
-    }
+    button { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    table th, table td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    table tbody tr:hover { background: #fafafa; }
+    #totale-settimanale { margin-top: 1rem; font-weight: bold; }
+    #esporta-stampa { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
   </style>
-
 </head>
 <body>
 
@@ -87,38 +29,50 @@
     <h1>Nota Spese Trasferta</h1>
   </header>
 
-  <!-- DATI GENERALI -->
+  <!-- SEZIONE DATI SETTIMANA -->
   <section>
     <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
-      <input type="text" id="dipendente" placeholder="Nome dipendente">
+      <input type="text" id="dipendente" placeholder="Nome dipendente" />
 
       <label for="targa">Targa Automezzo:</label>
-      <input type="text" id="targa" placeholder="Targa automezzo">
+      <input type="text" id="targa" placeholder="Targa automezzo" />
+    </div>
 
-      <!-- Numero Settimana (calcolato automaticamente) -->
-      <label for="numero-settimana">Settimana ISO:</label>
-      <input type="text" id="numero-settimana" readonly>
+    <!-- Numero settimana e pulsanti Carica/Salva -->
+    <div class="riga-dati">
+      <label for="numero-settimana">N. Settimana:</label>
+      <input type="number" id="numero-settimana" min="1" max="52" placeholder="Es. 12" />
+
+      <!-- Pulsante Carica: recupera da localStorage -->
+      <button id="carica-settimana">Carica Settimana</button>
+
+      <!-- Pulsante Salva: salva la settimana in localStorage -->
+      <button id="salva-settimana">Salva Settimana</button>
     </div>
   </section>
 
-  <!-- INSERIMENTO VOCE -->
+  <!-- SEZIONE INSERIMENTO VOCI -->
   <section>
     <h2>Inserisci Voce</h2>
     <div class="riga-giornaliera">
       <!-- Data -->
       <label for="data-giorno">Data:</label>
-      <input type="date" id="data-giorno">
+      <input type="date" id="data-giorno" />
 
-      <!-- Giorno (calcolato) -->
+      <!-- Giorno (auto) -->
       <label for="giorno-settimana">Giorno:</label>
-      <input type="text" id="giorno-settimana" readonly>
+      <input type="text" id="giorno-settimana" readonly />
 
-      <!-- Descrizione libera -->
-      <label for="descrizione-giorno">Descrizione Giorno:</label>
-      <input type="text" id="descrizione-giorno" placeholder="Esempio: Sede, Trasferta, ecc.">
+      <!-- Numero settimana auto (read-only, calcolato dalla data) -->
+      <label for="settimana-auto">Settimana (auto):</label>
+      <input type="text" id="settimana-auto" readonly />
 
-      <!-- Categoria -->
+      <!-- Descrizione Giorno -->
+      <label for="descrizione-giorno">Desc. Giorno:</label>
+      <input type="text" id="descrizione-giorno" placeholder="Sede, Trasferta, etc." />
+
+      <!-- Categoria & SottoCategoria -->
       <label for="categoria">Categoria:</label>
       <select id="categoria">
         <option value="">-- Seleziona --</option>
@@ -128,16 +82,15 @@
         <option value="carburante">Carburante</option>
       </select>
 
-      <!-- Sottocategoria -->
       <select id="sottocategoria">
         <option value="">-- Sottocategoria --</option>
       </select>
 
-      <!-- Valore (Km o Importo) -->
+      <!-- Valore (km o euro) -->
       <label for="valore-voce">Valore:</label>
-      <input type="number" id="valore-voce" placeholder="0">
-      
-      <!-- Pulsante Aggiungi -->
+      <input type="number" id="valore-voce" placeholder="0" />
+
+      <!-- Pulsante Aggiungi/Modifica -->
       <button id="aggiungi-voce">Aggiungi</button>
     </div>
   </section>
@@ -150,11 +103,11 @@
         <tr>
           <th>Data</th>
           <th>Giorno</th>
-          <th>Descriz.</th>
+          <th>Descrizione</th>
           <th>Categoria</th>
           <th>SottoCat</th>
           <th>Valore</th>
-          <th>Km Tot (stesso giorno)</th>
+          <th>Km Tot (giorno)</th>
           <th>Azioni</th>
         </tr>
       </thead>
@@ -174,13 +127,13 @@
     </div>
     <div class="riga-dati">
       <label for="firma-direzione">Visto Direzione:</label>
-      <input type="text" id="firma-direzione" placeholder="Firma Direzione">
+      <input type="text" id="firma-direzione" placeholder="Firma Direzione" />
       <label for="firma-dipendente">Firma Dipendente:</label>
-      <input type="text" id="firma-dipendente" placeholder="Firma Dipendente">
+      <input type="text" id="firma-dipendente" placeholder="Firma Dipendente" />
     </div>
   </section>
 
-  <!-- PULSANTI -->
+  <!-- PULSANTI ESPORTA/STAMPA -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
