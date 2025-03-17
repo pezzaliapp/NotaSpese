@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   //
-  // 1. Struttura dati
+  // 1. Sottocategorie
   //
   const sottoCatMap = {
     km: ['Km Iniziali','Km Finali'],
@@ -13,21 +13,24 @@ document.addEventListener('DOMContentLoaded', () => {
     carburante: ['Carta ENI']
   };
 
-  // Array di voci (NON salvate finché non clicchiamo "Salva Settimana")
+  //
+  // 2. Variabili
+  //
+  // vociCorrenti: array di oggetti { data, giorno, settimanaAuto, descrizione, categoria, sottocategoria, valore }
   let vociCorrenti = [];
-  let editIndex = -1; // se >=0 stiamo modificando
+  let editIndex = -1; // Se >=0 stiamo modificando una riga
 
   //
-  // 2. Selettori
+  // 3. Selettori
   //
-  // (Dati generali e gestione settimana)
+  // Dati generali
   const dipInput       = document.getElementById('dipendente');
   const targaInput     = document.getElementById('targa');
-  const numeroSettInput= document.getElementById('numero-settimana');
+  const nSettimanaInput= document.getElementById('numero-settimana');
   const caricaBtn      = document.getElementById('carica-settimana');
   const salvaBtn       = document.getElementById('salva-settimana');
 
-  // (Inserimento voce)
+  // Inserimento voce
   const dataInput      = document.getElementById('data-giorno');
   const giornoInput    = document.getElementById('giorno-settimana');
   const settAutoInput  = document.getElementById('settimana-auto');
@@ -37,82 +40,74 @@ document.addEventListener('DOMContentLoaded', () => {
   const valoreInput    = document.getElementById('valore-voce');
   const aggiungiBtn    = document.getElementById('aggiungi-voce');
 
-  // (Riepilogo)
+  // Riepilogo
   const riepilogoBody  = document.querySelector('#riepilogo-table tbody');
   const sommaSettEl    = document.getElementById('somma-settimanale');
 
-  // (Note e firme)
+  // Note e firme
   const noteArea       = document.getElementById('note');
   const firmaDirInput  = document.getElementById('firma-direzione');
   const firmaDipInput  = document.getElementById('firma-dipendente');
 
-  // (Pulsanti esporta/stampa)
+  // Pulsanti export
   const stampaTxtBtn   = document.getElementById('stampa-txt');
   const wappBtn        = document.getElementById('condividi-whatsapp');
   const stampaRepBtn   = document.getElementById('stampa-replica');
 
   //
-  // 3. Calcolo giorno e settimana ISO al cambio data
+  // 4. Cambio data => aggiorna giorno e settimana-auto
   //
   dataInput.addEventListener('change', () => {
     if (!dataInput.value) return;
-    // Esempio "2025-03-17" => [2025,03,17]
+    // es. "2025-03-17"
     const [yyyy, mm, dd] = dataInput.value.split('-');
     const d = new Date(+yyyy, +mm - 1, +dd);
 
-    // Giorno
     const giorniITA = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
     giornoInput.value = giorniITA[d.getDay()];
 
-    // Settimana ISO (auto)
+    // Settimana ISO
     const w = getISOWeekNumber(d);
     settAutoInput.value = w;
   });
 
-  function getISOWeekNumber(d) {
-    // Copia in UTC
-    const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  function getISOWeekNumber(dataJs) {
+    const tmp = new Date(Date.UTC(dataJs.getFullYear(), dataJs.getMonth(), dataJs.getDate()));
     let day = tmp.getUTCDay();
-    if (day === 0) day = 7;
-    tmp.setUTCDate(tmp.getUTCDate() + 4 - day);
+    if (day===0) day=7;
+    tmp.setUTCDate(tmp.getUTCDate()+4-day);
     const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
-    const weekNo = Math.ceil( ((tmp - yearStart)/86400000 + 1) / 7 );
-    return weekNo;
+    return Math.ceil( ((tmp - yearStart)/86400000 +1)/7 );
   }
 
   //
-  // 4. Cambio categoria => aggiorna sottocategoria
+  // 5. Cambio categoria => aggiorna sottocategoria
   //
   catSelect.addEventListener('change', () => {
     sottoCatSelect.innerHTML = '<option value="">-- Sottocategoria --</option>';
     const c = catSelect.value;
     if (sottoCatMap[c]) {
-      sottoCatMap[c].forEach(sc => {
+      sottoCatMap[c].forEach(sub => {
         const op = document.createElement('option');
-        op.value = sc;
-        op.textContent = sc;
+        op.value = sub; op.textContent = sub;
         sottoCatSelect.appendChild(op);
       });
     }
   });
 
   //
-  // 5. Click su Aggiungi (o Salva Modifica)
+  // 6. Aggiungi/Modifica voce
   //
   aggiungiBtn.addEventListener('click', () => {
-    // Verifiche minime
+    // Non puliamo data/giorno/sett in automatico, per NON uscire dalla data impostata
     if (!dataInput.value) {
       alert('Inserisci una data');
       return;
     }
     if (!catSelect.value || !sottoCatSelect.value) {
-      alert('Seleziona Categoria e Sottocategoria');
+      alert('Scegli Categoria e Sottocategoria');
       return;
     }
-    // Controlla che la data selezionata abbia la stessa settimana (auto) dell'eventuale altra data già inserita
-    // (Opzionale: se vuoi bloccare l’inserimento di date di settimane diverse)
-    // Per semplicità NON blocchiamo, ma si potrebbe.
-
     const voce = {
       data: dataInput.value,
       giorno: giornoInput.value,
@@ -124,17 +119,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (editIndex >= 0) {
+      // Salva modifica
       vociCorrenti[editIndex] = voce;
       editIndex = -1;
       aggiungiBtn.textContent = 'Aggiungi';
     } else {
+      // Nuova voce
       vociCorrenti.push(voce);
     }
 
-    // Pulizia campi
-    dataInput.value = '';
-    giornoInput.value = '';
-    settAutoInput.value = '';
+    // Reset di *solo* i campi che vogliamo
+    // (non resettiamo dataInput, giornoInput, settAutoInput)
+    // in modo che l'utente possa continuare a inserire altre voci per la stessa data
     descInput.value = '';
     catSelect.value = '';
     sottoCatSelect.innerHTML = '<option value="">-- Sottocategoria --</option>';
@@ -144,28 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   //
-  // 6. Aggiorna tabella
+  // 7. Aggiorna Tabella
   //
   function aggiornaTabella() {
     riepilogoBody.innerHTML = '';
-
-    // Mappa per km: { data => {kmIni, kmFin} }
-    const kmMap = {};
-
-    vociCorrenti.forEach(voce => {
-      if (voce.categoria === 'km') {
-        const key = voce.data;
-        if (!kmMap[key]) {
-          kmMap[key] = { kmIni: null, kmFin: null };
-        }
-        if (voce.sottocategoria === 'Km Iniziali') {
-          kmMap[key].kmIni = voce.valore;
-        }
-        if (voce.sottocategoria === 'Km Finali') {
-          kmMap[key].kmFin = voce.valore;
-        }
-      }
-    });
 
     vociCorrenti.forEach((voce, i) => {
       const tr = document.createElement('tr');
@@ -190,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tdCat.textContent = voce.categoria;
       tr.appendChild(tdCat);
 
-      // SottoCat
+      // Sottocategoria
       const tdSub = document.createElement('td');
       tdSub.textContent = voce.sottocategoria;
       tr.appendChild(tdSub);
@@ -200,19 +178,22 @@ document.addEventListener('DOMContentLoaded', () => {
       tdVal.textContent = voce.valore;
       tr.appendChild(tdVal);
 
-      // Km Tot
-      const tdKm = document.createElement('td');
-      if (kmMap[voce.data]) {
-        const { kmIni, kmFin } = kmMap[voce.data];
-        if (kmIni !== null && kmFin !== null) {
-          tdKm.textContent = kmFin - kmIni;
-        } else {
-          tdKm.textContent = ''; 
+      // Diff Km su questa riga
+      const tdDiff = document.createElement('td');
+      tdDiff.textContent = '0';
+      // Se la voce è "Km Finali", cerchiamo se esiste una voce "Km Iniziali" stessa data
+      if (voce.categoria === 'km' && voce.sottocategoria === 'Km Finali') {
+        // Troviamo "Km Iniziali" per la stessa data
+        const kmIni = vociCorrenti.find(v =>
+          v.data === voce.data &&
+          v.categoria === 'km' &&
+          v.sottocategoria === 'Km Iniziali'
+        );
+        if (kmIni) {
+          tdDiff.textContent = voce.valore - kmIni.valore;
         }
-      } else {
-        tdKm.textContent = '';
       }
-      tr.appendChild(tdKm);
+      tr.appendChild(tdDiff);
 
       // Azioni
       const tdAz = document.createElement('td');
@@ -226,12 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
         settAutoInput.value = voce.settimanaAuto;
         descInput.value = voce.descrizione;
         catSelect.value = voce.categoria;
-        // Ricarica le sottocategorie
+        // Ricarichiamo sottoCat
         sottoCatSelect.innerHTML = '<option value="">-- Sottocategoria --</option>';
         if (sottoCatMap[voce.categoria]) {
-          sottoCatMap[voce.categoria].forEach(sc => {
+          sottoCatMap[voce.categoria].forEach(sub => {
             const op = document.createElement('option');
-            op.value = sc; op.textContent = sc;
+            op.value=sub; op.textContent=sub;
             sottoCatSelect.appendChild(op);
           });
         }
@@ -256,23 +237,23 @@ document.addEventListener('DOMContentLoaded', () => {
       riepilogoBody.appendChild(tr);
     });
 
-    // Totale spese (no km)
-    let totSpese = 0;
+    // Totale spese
+    let totale = 0;
     vociCorrenti.forEach(v => {
       if (v.categoria !== 'km') {
-        totSpese += v.valore;
+        totale += v.valore;
       }
     });
-    sommaSettEl.textContent = totSpese.toFixed(2);
+    sommaSettEl.textContent = totale.toFixed(2);
   }
 
   //
-  // 7. Carica Settimana
+  // 8. Carica Settimana
   //
   caricaBtn.addEventListener('click', () => {
-    const nSett = numeroSettInput.value;
+    const nSett = nSettimanaInput.value;
     if (!nSett) {
-      alert('Inserisci un numero settimana da caricare');
+      alert('Inserisci il numero settimana da caricare');
       return;
     }
     const key = `NotaSpese_${nSett}`;
@@ -282,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const obj = JSON.parse(salvato);
-    // Ripristiniamo i campi
     dipInput.value      = obj.dipendente || '';
     targaInput.value    = obj.targa || '';
     noteArea.value      = obj.note || '';
@@ -292,20 +272,18 @@ document.addEventListener('DOMContentLoaded', () => {
     editIndex           = -1;
     aggiungiBtn.textContent = 'Aggiungi';
     aggiornaTabella();
+    alert(`Dati caricati per la settimana ${nSett}.`);
   });
 
   //
-  // 8. Salva Settimana
+  // 9. Salva Settimana
   //
   salvaBtn.addEventListener('click', () => {
-    const nSett = numeroSettInput.value;
+    const nSett = nSettimanaInput.value;
     if (!nSett) {
-      alert('Inserisci o conferma il numero di settimana per salvare');
+      alert('Inserisci il numero di settimana da salvare');
       return;
     }
-    // In base all’ULTIMA voce inserita potresti prendere la “settimanaAuto”
-    // Ma qui lasciamo all’utente la libertà di impostare manualmente “N. Settimana”
-
     const key = `NotaSpese_${nSett}`;
     const obj = {
       dipendente: dipInput.value.trim(),
@@ -316,60 +294,68 @@ document.addEventListener('DOMContentLoaded', () => {
       voci: vociCorrenti
     };
     localStorage.setItem(key, JSON.stringify(obj));
-    alert(`Settimana ${nSett} salvata con successo!`);
+    alert(`Settimana ${nSett} salvata correttamente!`);
   });
 
   //
-  // 9. Pulsanti stampa
+  // 10. Stampa in TXT / WhatsApp / Print
   //
   stampaTxtBtn.addEventListener('click', () => {
-    const nSett = numeroSettInput.value || '';
+    const nSett = nSettimanaInput.value || '';
     let testo = `NOTA SPESE TRASFERTA - Settimana ${nSett}\n\n`;
     testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
-
     vociCorrenti.forEach(v => {
       testo += `[${v.data} ${v.giorno}] ${v.descrizione} => ${v.categoria}/${v.sottocategoria} = ${v.valore}\n`;
-    });
-    // Totale
-    let totSpese = 0;
-    vociCorrenti.forEach(v => {
-      if (v.categoria !== 'km') {
-        totSpese += v.valore;
+      if (v.categoria==='km' && v.sottocategoria==='Km Finali') {
+        // Trova corrispondente Km Iniziali
+        const kmIni = vociCorrenti.find(x =>
+          x.data===v.data && x.categoria==='km' && x.sottocategoria==='Km Iniziali'
+        );
+        if (kmIni) {
+          const diff = v.valore - kmIni.valore;
+          testo += `Diff Km: ${diff}\n`;
+        }
       }
     });
-    testo += `\nTotale Spese (no Km): ${totSpese.toFixed(2)}\n\n`;
+    // Tot spese
+    let tot = 0;
+    vociCorrenti.forEach(x => { if (x.categoria!=='km') tot+= x.valore; });
+    testo += `\nTotale Spese (no Km): ${tot.toFixed(2)}\n\n`;
     testo += `Note: ${noteArea.value}\n`;
     testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
 
-    // Scarichiamo .txt
     const blob = new Blob([testo], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `nota_spese_sett_${nSett}.txt`;
+    a.href = url; a.download = `nota_spese_sett_${nSett}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   });
 
   wappBtn.addEventListener('click', () => {
-    const nSett = numeroSettInput.value || '';
-    let testo = `NOTA SPESE (Settimana ${nSett})\n`;
-    testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
+    const nSett = nSettimanaInput.value || '';
+    let testo = `NOTA SPESE (Settimana ${nSett})\nDipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
     vociCorrenti.forEach(v => {
-      testo += `[${v.data} ${v.giorno}] ${v.descrizione} => ${v.categoria}/${v.sottocategoria}: ${v.valore}\n\n`;
-    });
-    let totSpese = 0;
-    vociCorrenti.forEach(v => {
-      if (v.categoria !== 'km') {
-        totSpese += v.valore;
+      testo += `[${v.data} ${v.giorno}] ${v.descrizione}\n-> ${v.categoria}/${v.sottocategoria}: ${v.valore}\n`;
+      if (v.categoria==='km' && v.sottocategoria==='Km Finali') {
+        const kmIni = vociCorrenti.find(x =>
+          x.data===v.data && x.categoria==='km' && x.sottocategoria==='Km Iniziali'
+        );
+        if (kmIni) {
+          const diff = v.valore - kmIni.valore;
+          testo += `Diff Km: ${diff}\n`;
+        }
       }
+      testo += `\n`;
     });
-    testo += `Totale Spese (no Km): ${totSpese.toFixed(2)}\n\n`;
+    let tot = 0;
+    vociCorrenti.forEach(x => { if (x.categoria!=='km') tot+= x.valore; });
+    testo += `Totale Spese (no Km): ${tot.toFixed(2)}\n\n`;
     testo += `Note: ${noteArea.value}\n`;
     testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
 
-    const urlW = `whatsapp://send?text=${encodeURIComponent(testo)}`;
-    window.open(urlW, '_blank');
+    const url = `whatsapp://send?text=${encodeURIComponent(testo)}`;
+    window.open(url,'_blank');
   });
 
   stampaRepBtn.addEventListener('click', () => {
@@ -377,8 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   //
-  // 10. Fine
-  // (nessuna azione di default, partiamo con vociCorrenti vuoto,
-  //  l'utente può Caricare una settimana già esistente se vuole)
+  // 11. Avvio: nessun caricamento automatico, tabelle vuote
+  //
   aggiornaTabella();
 });
