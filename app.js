@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   //
-  // 1. Sottocategorie
+  // 1. Mappa Sottocategorie
   //
   const sottoCatMap = {
     km: ['Km Iniziali','Km Finali'],
@@ -14,19 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   //
-  // 2. Variabili
+  // 2. Strutture dati
   //
   // vociCorrenti: array di oggetti { data, giorno, settimanaAuto, descrizione, categoria, sottocategoria, valore }
   let vociCorrenti = [];
-  let editIndex = -1; // Se >=0 stiamo modificando una riga
+  let editIndex = -1; // se >=0 stiamo modificando
 
   //
   // 3. Selettori
   //
-  // Dati generali
   const dipInput       = document.getElementById('dipendente');
   const targaInput     = document.getElementById('targa');
-  const nSettimanaInput= document.getElementById('numero-settimana');
+  const nSettInput     = document.getElementById('numero-settimana');
   const caricaBtn      = document.getElementById('carica-settimana');
   const salvaBtn       = document.getElementById('salva-settimana');
 
@@ -40,11 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const valoreInput    = document.getElementById('valore-voce');
   const aggiungiBtn    = document.getElementById('aggiungi-voce');
 
-  // Riepilogo
+  // Tabella di editing
   const riepilogoBody  = document.querySelector('#riepilogo-table tbody');
   const sommaSettEl    = document.getElementById('somma-settimanale');
 
-  // Note e firme
+  // Report settimanale
+  const reportBody     = document.querySelector('#report-table tbody');
+  const reportTotali   = document.getElementById('report-totali');
+
+  // Note / firme
   const noteArea       = document.getElementById('note');
   const firmaDirInput  = document.getElementById('firma-direzione');
   const firmaDipInput  = document.getElementById('firma-dipendente');
@@ -55,33 +58,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const stampaRepBtn   = document.getElementById('stampa-replica');
 
   //
-  // 4. Cambio data => aggiorna giorno e settimana-auto
+  // 4. Cambio data => calcolo giorno e settimana
   //
   dataInput.addEventListener('change', () => {
     if (!dataInput.value) return;
-    // es. "2025-03-17"
+    // Esempio: "2025-03-17"
     const [yyyy, mm, dd] = dataInput.value.split('-');
-    const d = new Date(+yyyy, +mm - 1, +dd);
+    const d = new Date(+yyyy, +mm -1, +dd);
 
     const giorniITA = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
     giornoInput.value = giorniITA[d.getDay()];
 
-    // Settimana ISO
     const w = getISOWeekNumber(d);
     settAutoInput.value = w;
   });
 
-  function getISOWeekNumber(dataJs) {
-    const tmp = new Date(Date.UTC(dataJs.getFullYear(), dataJs.getMonth(), dataJs.getDate()));
+  function getISOWeekNumber(d) {
+    const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     let day = tmp.getUTCDay();
-    if (day===0) day=7;
+    if (day === 0) day = 7;
     tmp.setUTCDate(tmp.getUTCDate()+4-day);
     const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
-    return Math.ceil( ((tmp - yearStart)/86400000 +1)/7 );
+    return Math.ceil(((tmp - yearStart)/86400000 +1)/7);
   }
 
   //
-  // 5. Cambio categoria => aggiorna sottocategoria
+  // 5. Cambio categoria => aggiorna sottocategorie
   //
   catSelect.addEventListener('change', () => {
     sottoCatSelect.innerHTML = '<option value="">-- Sottocategoria --</option>';
@@ -89,17 +91,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sottoCatMap[c]) {
       sottoCatMap[c].forEach(sub => {
         const op = document.createElement('option');
-        op.value = sub; op.textContent = sub;
+        op.value=sub; op.textContent=sub;
         sottoCatSelect.appendChild(op);
       });
     }
   });
 
   //
-  // 6. Aggiungi/Modifica voce
+  // 6. Aggiungi / Modifica voce
   //
   aggiungiBtn.addEventListener('click', () => {
-    // Non puliamo data/giorno/sett in automatico, per NON uscire dalla data impostata
     if (!dataInput.value) {
       alert('Inserisci una data');
       return;
@@ -119,30 +120,28 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (editIndex >= 0) {
-      // Salva modifica
+      // Modifichiamo una riga esistente
       vociCorrenti[editIndex] = voce;
       editIndex = -1;
-      aggiungiBtn.textContent = 'Aggiungi';
+      aggiungiBtn.textContent='Aggiungi';
     } else {
       // Nuova voce
       vociCorrenti.push(voce);
     }
 
-    // Reset di *solo* i campi che vogliamo
-    // (non resettiamo dataInput, giornoInput, settAutoInput)
-    // in modo che l'utente possa continuare a inserire altre voci per la stessa data
+    // Se vuoi NON cambiare la data e la categoria per altre voci,
+    // basta pulire solo descrizione e valore:
     descInput.value = '';
-    catSelect.value = '';
-    sottoCatSelect.innerHTML = '<option value="">-- Sottocategoria --</option>';
     valoreInput.value = '';
 
-    aggiornaTabella();
+    aggiornaTabelle();
   });
 
   //
-  // 7. Aggiorna Tabella
+  // 7. Aggiorna tabelle (editing + report)
   //
-  function aggiornaTabella() {
+  function aggiornaTabelle() {
+    // 7a) Tabella di editing
     riepilogoBody.innerHTML = '';
 
     vociCorrenti.forEach((voce, i) => {
@@ -157,6 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const tdGiorno = document.createElement('td');
       tdGiorno.textContent = voce.giorno;
       tr.appendChild(tdGiorno);
+
+      // Settimana
+      const tdSett = document.createElement('td');
+      tdSett.textContent = voce.settimanaAuto || '';
+      tr.appendChild(tdSett);
 
       // Descrizione
       const tdDesc = document.createElement('td');
@@ -178,16 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
       tdVal.textContent = voce.valore;
       tr.appendChild(tdVal);
 
-      // Diff Km su questa riga
+      // Diff Km => 0 se “Km Iniziali”, se “Km Finali” => differenza con “Km Iniziali” stessa data
       const tdDiff = document.createElement('td');
       tdDiff.textContent = '0';
-      // Se la voce è "Km Finali", cerchiamo se esiste una voce "Km Iniziali" stessa data
-      if (voce.categoria === 'km' && voce.sottocategoria === 'Km Finali') {
-        // Troviamo "Km Iniziali" per la stessa data
-        const kmIni = vociCorrenti.find(v =>
-          v.data === voce.data &&
-          v.categoria === 'km' &&
-          v.sottocategoria === 'Km Iniziali'
+      if (voce.categoria==='km' && voce.sottocategoria==='Km Finali') {
+        const kmIni = vociCorrenti.find(x =>
+          x.data===voce.data && x.categoria==='km' && x.sottocategoria==='Km Iniziali'
         );
         if (kmIni) {
           tdDiff.textContent = voce.valore - kmIni.valore;
@@ -197,9 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Azioni
       const tdAz = document.createElement('td');
-      // Modifica
       const btnMod = document.createElement('button');
-      btnMod.textContent = 'Modifica';
+      btnMod.textContent='Modifica';
       btnMod.addEventListener('click', () => {
         editIndex = i;
         dataInput.value = voce.data;
@@ -207,59 +206,148 @@ document.addEventListener('DOMContentLoaded', () => {
         settAutoInput.value = voce.settimanaAuto;
         descInput.value = voce.descrizione;
         catSelect.value = voce.categoria;
-        // Ricarichiamo sottoCat
         sottoCatSelect.innerHTML = '<option value="">-- Sottocategoria --</option>';
         if (sottoCatMap[voce.categoria]) {
-          sottoCatMap[voce.categoria].forEach(sub => {
+          sottoCatMap[voce.categoria].forEach(sc => {
             const op = document.createElement('option');
-            op.value=sub; op.textContent=sub;
+            op.value=sc; op.textContent=sc;
             sottoCatSelect.appendChild(op);
           });
         }
-        sottoCatSelect.value = voce.sottocategoria;
+        sottoCatSelect.value=voce.sottocategoria;
         valoreInput.value = voce.valore;
-        aggiungiBtn.textContent = 'Salva Modifica';
+        aggiungiBtn.textContent='Salva Modifica';
       });
       tdAz.appendChild(btnMod);
 
-      // Elimina
       const btnDel = document.createElement('button');
-      btnDel.textContent = 'Elimina';
-      btnDel.style.marginLeft = '5px';
+      btnDel.textContent='Elimina';
+      btnDel.style.marginLeft='5px';
       btnDel.addEventListener('click', () => {
         vociCorrenti.splice(i,1);
-        aggiornaTabella();
+        aggiornaTabelle();
       });
       tdAz.appendChild(btnDel);
 
       tr.appendChild(tdAz);
-
       riepilogoBody.appendChild(tr);
     });
 
-    // Totale spese
-    let totale = 0;
-    vociCorrenti.forEach(v => {
-      if (v.categoria !== 'km') {
-        totale += v.valore;
-      }
-    });
-    sommaSettEl.textContent = totale.toFixed(2);
+    // Totale spese (no km)
+    let totSpese = 0;
+    vociCorrenti.forEach(v => { if(v.categoria!=='km') totSpese += v.valore; });
+    sommaSettEl.textContent = totSpese.toFixed(2);
+
+    // 7b) Aggiorna il “Report Settimanale”
+    aggiornaReport();
   }
 
   //
-  // 8. Carica Settimana
+  // 8. Report Settimanale
+  //
+  function aggiornaReport() {
+    reportBody.innerHTML = '';
+    reportTotali.innerHTML = '';
+
+    // Ordiniamo le voci per data
+    const vociOrdinate = [...vociCorrenti].sort((a,b) => a.data.localeCompare(b.data));
+
+    // Raggruppiamo per data
+    const dayMap = {};
+    vociOrdinate.forEach(voce => {
+      if (!dayMap[voce.data]) dayMap[voce.data] = [];
+      dayMap[voce.data].push(voce);
+    });
+
+    let totKmSett = 0;
+    let totSpeseSett = 0;
+
+    // Per ogni data, calcoliamo KmIniziali, KmFinali, diff, subtot spese
+    Object.keys(dayMap).sort().forEach(dataKey => {
+      const elenco = dayMap[dataKey];
+      const voce0 = elenco[0]; // prendiamo la prima voce per giorno/giorno/sett
+      const giorno = voce0.giorno;
+      const settAuto = voce0.settimanaAuto || '??';
+      let descrGiorno = '';
+      let kmIni = null, kmFin=null;
+      let subSpese = 0;
+
+      elenco.forEach(v => {
+        if (v.categoria==='km') {
+          if (v.sottocategoria==='Km Iniziali') kmIni = v.valore;
+          if (v.sottocategoria==='Km Finali')   kmFin = v.valore;
+        } else {
+          subSpese += v.valore;
+        }
+        // Se vuoi prendere la descrizione “più significativa”
+        if (!descrGiorno && v.descrizione) descrGiorno = v.descrizione;
+      });
+
+      let diffKm = 0;
+      if (kmIni!==null && kmFin!==null) diffKm = kmFin - kmIni;
+
+      totKmSett += diffKm;
+      totSpeseSett += subSpese;
+
+      // Creiamo la riga report
+      const tr = document.createElement('tr');
+
+      // colonna “Settimana”
+      const tdSet = document.createElement('td');
+      tdSet.textContent = settAuto;
+      tr.appendChild(tdSet);
+
+      const tdData = document.createElement('td');
+      tdData.textContent = dataKey;
+      tr.appendChild(tdData);
+
+      const tdGiorno = document.createElement('td');
+      tdGiorno.textContent = giorno;
+      tr.appendChild(tdGiorno);
+
+      const tdDesc = document.createElement('td');
+      tdDesc.textContent = descrGiorno;
+      tr.appendChild(tdDesc);
+
+      const tdIni = document.createElement('td');
+      tdIni.textContent = (kmIni!==null)? kmIni : '';
+      tr.appendChild(tdIni);
+
+      const tdFin = document.createElement('td');
+      tdFin.textContent = (kmFin!==null)? kmFin : '';
+      tr.appendChild(tdFin);
+
+      const tdDiff = document.createElement('td');
+      tdDiff.textContent = diffKm;
+      tr.appendChild(tdDiff);
+
+      const tdSpese = document.createElement('td');
+      tdSpese.textContent = subSpese.toFixed(2);
+      tr.appendChild(tdSpese);
+
+      reportBody.appendChild(tr);
+    });
+
+    // Totali
+    reportTotali.innerHTML = `
+      Km totali nella settimana: ${totKmSett}<br/>
+      Spese totali nella settimana: ${totSpeseSett.toFixed(2)}
+    `;
+  }
+
+  //
+  // 9. Carica Settimana
   //
   caricaBtn.addEventListener('click', () => {
-    const nSett = nSettimanaInput.value;
+    const nSett = nSettInput.value;
     if (!nSett) {
-      alert('Inserisci il numero settimana da caricare');
+      alert('Inserisci il numero di settimana da caricare');
       return;
     }
     const key = `NotaSpese_${nSett}`;
     const salvato = localStorage.getItem(key);
     if (!salvato) {
-      alert(`Nessun salvataggio trovato per la settimana ${nSett}`);
+      alert(`Nessun salvataggio per la settimana ${nSett}`);
       return;
     }
     const obj = JSON.parse(salvato);
@@ -269,17 +357,17 @@ document.addEventListener('DOMContentLoaded', () => {
     firmaDirInput.value = obj.firmaDirezione || '';
     firmaDipInput.value = obj.firmaDipendente || '';
     vociCorrenti        = obj.voci || [];
-    editIndex           = -1;
-    aggiungiBtn.textContent = 'Aggiungi';
-    aggiornaTabella();
-    alert(`Dati caricati per la settimana ${nSett}.`);
+    editIndex = -1;
+    aggiungiBtn.textContent='Aggiungi';
+    aggiornaTabelle();
+    alert(`Settimana ${nSett} caricata con successo!`);
   });
 
   //
-  // 9. Salva Settimana
+  // 10. Salva Settimana
   //
   salvaBtn.addEventListener('click', () => {
-    const nSett = nSettimanaInput.value;
+    const nSett = nSettInput.value;
     if (!nSett) {
       alert('Inserisci il numero di settimana da salvare');
       return;
@@ -298,59 +386,58 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   //
-  // 10. Stampa in TXT / WhatsApp / Print
+  // 11. Stampa, WhatsApp, Print
   //
   stampaTxtBtn.addEventListener('click', () => {
-    const nSett = nSettimanaInput.value || '';
-    let testo = `NOTA SPESE TRASFERTA - Settimana ${nSett}\n\n`;
+    const nSett = nSettInput.value || '';
+    let testo = `NOTA SPESE - Settimana ${nSett}\n\n`;
     testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
     vociCorrenti.forEach(v => {
-      testo += `[${v.data} ${v.giorno}] ${v.descrizione} => ${v.categoria}/${v.sottocategoria} = ${v.valore}\n`;
+      testo += `[${v.data} ${v.giorno}] S${v.settimanaAuto} - ${v.descrizione} => ${v.categoria}/${v.sottocategoria} = ${v.valore}`;
       if (v.categoria==='km' && v.sottocategoria==='Km Finali') {
-        // Trova corrispondente Km Iniziali
-        const kmIni = vociCorrenti.find(x =>
+        const ini = vociCorrenti.find(x =>
           x.data===v.data && x.categoria==='km' && x.sottocategoria==='Km Iniziali'
         );
-        if (kmIni) {
-          const diff = v.valore - kmIni.valore;
-          testo += `Diff Km: ${diff}\n`;
+        if (ini) {
+          const diff = v.valore - ini.valore;
+          testo += ` (Diff Km: ${diff})`;
         }
       }
+      testo += `\n`;
     });
-    // Tot spese
-    let tot = 0;
-    vociCorrenti.forEach(x => { if (x.categoria!=='km') tot+= x.valore; });
-    testo += `\nTotale Spese (no Km): ${tot.toFixed(2)}\n\n`;
+    let totSpese = 0;
+    vociCorrenti.forEach(x => { if(x.categoria!=='km') totSpese+= x.valore; });
+    testo += `\nTotale Spese (no Km): ${totSpese.toFixed(2)}\n`;
     testo += `Note: ${noteArea.value}\n`;
     testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
 
-    const blob = new Blob([testo], { type: 'text/plain' });
+    const blob = new Blob([testo], { type:'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `nota_spese_sett_${nSett}.txt`;
+    a.href=url; a.download=`nota_spese_sett_${nSett}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   });
 
   wappBtn.addEventListener('click', () => {
-    const nSett = nSettimanaInput.value || '';
+    const nSett = nSettInput.value || '';
     let testo = `NOTA SPESE (Settimana ${nSett})\nDipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
     vociCorrenti.forEach(v => {
-      testo += `[${v.data} ${v.giorno}] ${v.descrizione}\n-> ${v.categoria}/${v.sottocategoria}: ${v.valore}\n`;
+      testo += `[${v.data} - S${v.settimanaAuto}] ${v.giorno} => ${v.categoria}/${v.sottocategoria}: ${v.valore}\n`;
       if (v.categoria==='km' && v.sottocategoria==='Km Finali') {
-        const kmIni = vociCorrenti.find(x =>
+        const ini = vociCorrenti.find(x =>
           x.data===v.data && x.categoria==='km' && x.sottocategoria==='Km Iniziali'
         );
-        if (kmIni) {
-          const diff = v.valore - kmIni.valore;
+        if (ini) {
+          const diff = v.valore - ini.valore;
           testo += `Diff Km: ${diff}\n`;
         }
       }
       testo += `\n`;
     });
-    let tot = 0;
-    vociCorrenti.forEach(x => { if (x.categoria!=='km') tot+= x.valore; });
-    testo += `Totale Spese (no Km): ${tot.toFixed(2)}\n\n`;
+    let totSpese = 0;
+    vociCorrenti.forEach(x => { if(x.categoria!=='km') totSpese += x.valore; });
+    testo += `Totale Spese (no Km): ${totSpese.toFixed(2)}\n\n`;
     testo += `Note: ${noteArea.value}\n`;
     testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
 
@@ -363,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   //
-  // 11. Avvio: nessun caricamento automatico, tabelle vuote
+  // 12. Avvio
   //
-  aggiornaTabella();
+  aggiornaTabelle(); // tabelle vuote all'inizio
 });
