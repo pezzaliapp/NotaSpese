@@ -5,14 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
 
-  <!-- Collegamento al foglio di stile -->
+  <!-- Foglio di stile -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Manifest PWA (opzionale, se vuoi rendere questa app installabile) -->
-  <!--
-  <link rel="manifest" href="manifest.json" />
-  -->
-
 </head>
 <body>
 
@@ -23,29 +17,18 @@
 
   <!-- SEZIONE DATI PRINCIPALI -->
   <section id="sezione-dati-principali">
-    <!-- Data, Giorno, Numero Settimana -->
     <div class="riga-dati">
-      <label for="data-giorno">Data:</label>
-      <input type="date" class="data-giorno" id="data-giorno" />
-
-      <label for="giorno-settimana">Giorno:</label>
-      <input type="text" class="giorno-settimana" id="giorno-settimana" readonly />
-
-      <label for="numero-settimana">Numero Settimana:</label>
-      <input type="text" class="numero-settimana" id="numero-settimana" readonly />
-    </div>
-
-    <!-- Dipendente, Targa e (volendo) un Numero Settimana "generale" -->
-    <div class="riga-dati">
+      <!-- Dipendente -->
       <label for="dipendente">Dipendente:</label>
       <input type="text" id="dipendente" placeholder="Inserisci nome dipendente" />
 
+      <!-- Targa Automezzo -->
       <label for="targa">Targa Automezzo:</label>
       <input type="text" id="targa" placeholder="Inserisci targa automezzo" />
 
-      <label for="settimana-generale">Numero settimana:</label>
-      <input type="text" id="settimana-generale" placeholder="Es." />
-      <!-- Se vuoi popolare automaticamente questo anche, puoi usare la logica di app.js -->
+      <!-- Numero Settimana (auto-calcolato in app.js) -->
+      <label for="numero-settimana">Numero Settimana:</label>
+      <input type="text" class="numero-settimana" id="numero-settimana" readonly />
     </div>
   </section>
 
@@ -53,23 +36,16 @@
   <section id="inserimento-spese">
     <h2>Inserisci le spese giornaliere</h2>
 
-    <!-- Riga per la selezione di data/giorno/categoria/sottocategoria/importo -->
     <div class="riga-giornaliera">
-      <!-- Data (già sopra) e Giorno e Settimana li abbiamo in testa,
-           ma se vuoi potresti duplicare un input date per ogni riga. -->
-      <label for="giorno-selezione">Giorno:</label>
-      <select class="giorno-settimana-manuale" id="giorno-selezione">
-        <!-- Se vuoi compilarlo manualmente, oppure puoi omettere questo e usare solo quello readOnly -->
-        <option value="Lunedì">Lunedì</option>
-        <option value="Martedì">Martedì</option>
-        <option value="Mercoledì">Mercoledì</option>
-        <option value="Giovedì">Giovedì</option>
-        <option value="Venerdì">Venerdì</option>
-        <option value="Sabato">Sabato</option>
-        <option value="Domenica">Domenica</option>
-      </select>
+      <!-- Data -->
+      <label for="data-giorno">Data:</label>
+      <input type="date" class="data-giorno" id="data-giorno" />
 
-      <!-- Selezione Categoria -->
+      <!-- Giorno (readonly, aggiornato da app.js) -->
+      <label for="giorno-settimana">Giorno:</label>
+      <input type="text" class="giorno-settimana" id="giorno-settimana" readonly />
+
+      <!-- Categoria -->
       <label for="categoria">Categoria:</label>
       <select class="categoria" id="categoria">
         <option value="km">Km</option>
@@ -78,9 +54,8 @@
         <option value="carburante">Carburante</option>
       </select>
 
-      <!-- Sottocategoria -->
+      <!-- Sottocategoria (popolata dinamicamente da app.js) -->
       <select class="sottocategoria" id="sottocategoria">
-        <!-- Verrà popolato da app.js -->
         <option value="">-- Sottocategoria --</option>
       </select>
 
@@ -92,7 +67,7 @@
       <label for="foto">Allegato:</label>
       <input type="file" class="foto" id="foto" accept="image/*" />
 
-      <!-- Pulsante aggiungi -->
+      <!-- Pulsante Aggiungi -->
       <button class="aggiungi-voce" id="aggiungi-voce">Aggiungi</button>
     </div>
 
@@ -101,9 +76,9 @@
       Totale settimana: <span id="somma-settimanale">0.00</span> €
     </div>
 
-    <!-- Riepilogo -->
+    <!-- Riepilogo delle spese -->
     <div id="riepilogo-giornaliero">
-      <!-- Popolato dinamicamente da app.js -->
+      <!-- Verrà popolato dinamicamente da app.js -->
     </div>
   </section>
 
@@ -114,7 +89,6 @@
       <textarea id="note" rows="3" placeholder="Inserisci eventuali annotazioni..."></textarea>
     </div>
 
-    <!-- Firme -->
     <div id="firme">
       <div class="firma">
         <label for="firma-direzione">Visto Direzione</label>
@@ -136,15 +110,5 @@
 
   <!-- Script principale -->
   <script src="app.js"></script>
-
-  <!-- Registrazione Service Worker (opzionale, se vuoi PWA offline) -->
-  <!--
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
-  -->
-
 </body>
 </html>
