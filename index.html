@@ -4,13 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-
-  <!-- Foglio di stile -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <h1>Nota Spese Trasferta</h1>
   </header>
@@ -26,67 +23,88 @@
       <label for="targa">Targa Automezzo:</label>
       <input type="text" id="targa" placeholder="Inserisci targa automezzo" />
 
-      <!-- Numero Settimana (auto-calcolato in app.js) -->
+      <!-- Numero Settimana -->
       <label for="numero-settimana">Numero Settimana:</label>
-      <input type="text" class="numero-settimana" id="numero-settimana" readonly />
+      <input type="number" id="numero-settimana" min="1" max="52" placeholder="Es. 12" />
+      <!-- Quando cambia, carica i dati da localStorage (vedi app.js) -->
     </div>
   </section>
 
   <!-- SEZIONE INSERIMENTO SPESE GIORNALIERE -->
   <section id="inserimento-spese">
-    <h2>Inserisci le spese giornaliere</h2>
+    <h2>Inserisci / Modifica voce spesa</h2>
 
     <div class="riga-giornaliera">
       <!-- Data -->
       <label for="data-giorno">Data:</label>
-      <input type="date" class="data-giorno" id="data-giorno" />
+      <input type="date" id="data-giorno" />
 
-      <!-- Giorno (readonly, aggiornato da app.js) -->
+      <!-- Giorno (auto) -->
       <label for="giorno-settimana">Giorno:</label>
-      <input type="text" class="giorno-settimana" id="giorno-settimana" readonly />
+      <input type="text" id="giorno-settimana" readonly />
+
+      <!-- Descrizione libero (ad es. "Sede", "Lombardia", ecc.) -->
+      <label for="descrizione-giorno">Descrizione Giorno:</label>
+      <input type="text" id="descrizione-giorno" placeholder="Es. Sede, Trasferta, etc." />
 
       <!-- Categoria -->
       <label for="categoria">Categoria:</label>
-      <select class="categoria" id="categoria">
+      <select id="categoria">
+        <option value="">-- Seleziona --</option>
         <option value="km">Km</option>
         <option value="spese-viaggio">Spese Viaggio</option>
         <option value="alloggio-pasti">Alloggio e Pasti</option>
         <option value="carburante">Carburante</option>
       </select>
 
-      <!-- Sottocategoria (popolata dinamicamente da app.js) -->
-      <select class="sottocategoria" id="sottocategoria">
+      <!-- Sottocategoria -->
+      <select id="sottocategoria">
         <option value="">-- Sottocategoria --</option>
       </select>
 
-      <!-- Importo -->
-      <label for="importo">Importo:</label>
-      <input type="number" class="importo" id="importo" step="0.01" placeholder="0.00" />
+      <!-- Importo / Valore -->
+      <label for="importo">Valore:</label>
+      <input type="number" id="importo" step="1" placeholder="0" />
+      <!-- step="1" perché i km sono numeri interi, ma puoi adattare se serve virgola. -->
 
-      <!-- Allegato (foto) -->
-      <label for="foto">Allegato:</label>
-      <input type="file" class="foto" id="foto" accept="image/*" />
-
-      <!-- Pulsante Aggiungi -->
-      <button class="aggiungi-voce" id="aggiungi-voce">Aggiungi</button>
-    </div>
-
-    <!-- Totale settimanale -->
-    <div id="totale-settimanale">
-      Totale settimana: <span id="somma-settimanale">0.00</span> €
-    </div>
-
-    <!-- Riepilogo delle spese -->
-    <div id="riepilogo-giornaliero">
-      <!-- Verrà popolato dinamicamente da app.js -->
+      <!-- Pulsante per aggiungere / modificare -->
+      <button id="aggiungi-voce">Aggiungi Voce</button>
+      <!-- In app.js, se stiamo modificando una riga esistente, questo bottone farà un “salvataggio modifica” -->
     </div>
   </section>
 
-  <!-- SEZIONE NOTE E FIRME -->
+  <!-- SEZIONE RIEPILOGO -->
+  <section id="riepilogo-sezione">
+    <h2>Riepilogo Spese</h2>
+    <!-- Tabella / container per tutte le voci inserite -->
+    <table id="riepilogo-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Giorno</th>
+          <th>Descrizione</th>
+          <th>Categoria</th>
+          <th>SottoCat</th>
+          <th>Valore</th>
+          <th>Tot. Km Giornalieri</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Popolato da app.js -->
+      </tbody>
+    </table>
+
+    <div id="totale-settimanale">
+      <strong>Totale settimana (solo spese in €):</strong> <span id="somma-settimanale">0</span>
+    </div>
+  </section>
+
+  <!-- NOTE E FIRME -->
   <section id="sezione-note-firme">
     <div class="note-container">
       <label for="note">Note:</label>
-      <textarea id="note" rows="3" placeholder="Inserisci eventuali annotazioni..."></textarea>
+      <textarea id="note" rows="3" placeholder="Eventuali annotazioni..."></textarea>
     </div>
 
     <div id="firme">
@@ -101,14 +119,13 @@
     </div>
   </section>
 
-  <!-- SEZIONE PULSANTI -->
+  <!-- PULSANTI -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
     <button id="stampa-replica">Stampa Replica Form</button>
   </section>
 
-  <!-- Script principale -->
   <script src="app.js"></script>
 </body>
 </html>
