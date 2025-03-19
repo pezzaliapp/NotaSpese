@@ -43,7 +43,32 @@
   <section>
     <table id="table-spese">
       <thead>
-        <tr>
+        <!-- RIGA DATE (popolata in automatico da app.js) -->
+        <tr id="date-row">
+          <th></th>
+          <th>--</th>
+          <th>--</th>
+          <th>--</th>
+          <th>--</th>
+          <th>--</th>
+          <th>--</th>
+          <th>--</th>
+          <th></th>
+        </tr>
+        <!-- RIGA LUOGO (input per il luogo di ogni giorno) -->
+        <tr id="luogo-row">
+          <th></th>
+          <th><input type="text" placeholder="Luogo" class="luogo-input" data-day="lun"/></th>
+          <th><input type="text" placeholder="Luogo" class="luogo-input" data-day="mar"/></th>
+          <th><input type="text" placeholder="Luogo" class="luogo-input" data-day="mer"/></th>
+          <th><input type="text" placeholder="Luogo" class="luogo-input" data-day="gio"/></th>
+          <th><input type="text" placeholder="Luogo" class="luogo-input" data-day="ven"/></th>
+          <th><input type="text" placeholder="Luogo" class="luogo-input" data-day="sab"/></th>
+          <th><input type="text" placeholder="Luogo" class="luogo-input" data-day="dom"/></th>
+          <th></th>
+        </tr>
+        <!-- RIGA GIORNI -->
+        <tr id="days-row">
           <th>Categoria / Sottocategoria</th>
           <th>Lunedì</th>
           <th>Martedì</th>
