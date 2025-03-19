@@ -12,76 +12,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const stampaTxtBtn = document.getElementById('stampa-txt');
     const whatsappBtn = document.getElementById('condividi-whatsapp');
 
-    let speseData = {}; // Oggetto che conterrà i dati salvati per la settimana selezionata
+    let speseData = {}; // Oggetto per memorizzare i dati
 
-    // 📌 Funzione per calcolare il numero della settimana e il giorno della settimana
-    function calcolaSettimanaEDay(data) {
-        const dateObj = new Date(data);
-        if (isNaN(dateObj)) return { settimana: '', giorno: '' };
-
-        const primoGennaio = new Date(dateObj.getFullYear(), 0, 1);
-        const giornoAnno = Math.floor((dateObj - primoGennaio) / (24 * 60 * 60 * 1000)) + 1;
-        const settimana = Math.ceil(giornoAnno / 7);
-        const giorniSettimana = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
-        const giorno = giorniSettimana[dateObj.getDay()];
-        return { settimana, giorno };
-    }
-
-    // 📌 Funzione per aggiornare i calcoli della tabella
+    // 📌 Funzione per aggiornare i totali
     function aggiornaCalcoli() {
         let totaleKmSettimana = 0;
         let totaleSettimanale = 0;
 
-        ["lun", "mar", "mer", "gio", "ven", "sab", "dom"].forEach(giorno => {
-            const kmIni = speseData[giorno]?.kmIni || 0;
-            const kmFin = speseData[giorno]?.kmFin || 0;
-            const kmDiff = kmFin - kmIni;
-            speseData[giorno].kmDiff = kmDiff;
-            totaleKmSettimana += kmDiff;
+        // Itera su tutte le righe della tabella
+        document.querySelectorAll("tr").forEach(row => {
+            let totaleRiga = 0;
 
-            // Scrive il valore della differenza km
-            const cellKmDiff = tableSpese.querySelector(`td[data-cat="kmDiff"][data-day="${giorno}"]`);
-            if (cellKmDiff) cellKmDiff.innerText = kmDiff;
-
-            // Calcolo subtotali per ogni categoria
-            let subtotaleGiorno = 0;
-            ["parcheggi", "noleggio", "taxiBus", "biglietti", "carburCont", "viaggioAltro", "alloggio", "colazione", "pranzo", "cena", "acquaCaffe", "alloggioAltro", "cartaEni"].forEach(cat => {
-                subtotaleGiorno += speseData[giorno]?.[cat] || 0;
+            // Prende tutte le celle della riga tranne l'ultima (Totale)
+            const celle = row.querySelectorAll("td[data-cat]");
+            celle.forEach(cella => {
+                let valore = parseFloat(cella.innerText) || 0;
+                totaleRiga += valore;
             });
 
-            totaleSettimanale += subtotaleGiorno;
+            // Scrive il totale nella colonna "Totale"
+            const cellaTotale = row.querySelector(".totale-riga");
+            if (cellaTotale) {
+                cellaTotale.innerText = totaleRiga.toFixed(2);
+            }
 
-            // Aggiorna il subtotale giornaliero nella tabella
-            const cellSubtotale = tableSpese.querySelector(`td[data-cat="subtotaleDay"][data-day="${giorno}"]`);
-            if (cellSubtotale) cellSubtotale.innerText = subtotaleGiorno.toFixed(2);
+            // Se la riga è dei Km, aggiorna anche il totale settimanale Km
+            if (row.classList.contains("km-giornalieri")) {
+                totaleKmSettimana += totaleRiga;
+            }
+
+            // Somma al totale generale
+            totaleSettimanale += totaleRiga;
         });
 
-        // Aggiorna il totale della settimana
+        // Aggiorna i totali
         document.querySelector(".km-sett-tot").innerText = totaleKmSettimana.toFixed(2);
         document.querySelector(".totale-settimana").innerText = totaleSettimanale.toFixed(2);
     }
 
-    // 📌 Funzione per ripristinare le celle con i dati salvati
-    function ripristinaCelle() {
-        Object.keys(speseData).forEach(giorno => {
-            Object.keys(speseData[giorno]).forEach(cat => {
-                const cell = tableSpese.querySelector(`td[data-cat="${cat}"][data-day="${giorno}"]`);
-                if (cell) cell.innerText = speseData[giorno][cat];
-            });
+    // 📌 Funzione per aggiornare le differenze Km Finali - Km Iniziali
+    function calcolaKmGiornalieri() {
+        ["lun", "mar", "mer", "gio", "ven", "sab", "dom"].forEach(giorno => {
+            const kmIni = parseFloat(document.querySelector(`td[data-cat="kmIni"][data-day="${giorno}"]`)?.innerText) || 0;
+            const kmFin = parseFloat(document.querySelector(`td[data-cat="kmFin"][data-day="${giorno}"]`)?.innerText) || 0;
+            const kmDiff = kmFin - kmIni;
+
+            const cellKmDiff = document.querySelector(`td[data-cat="kmDiff"][data-day="${giorno}"]`);
+            if (cellKmDiff) {
+                cellKmDiff.innerText = kmDiff.toFixed(2);
+            }
         });
-        aggiornaCalcoli();
     }
 
     // 📌 Evento per modificare i valori nelle celle
     tableSpese.addEventListener('input', (e) => {
         const cell = e.target;
+        const valore = parseFloat(cell.innerText) || 0;
         const cat = cell.dataset.cat;
         const day = cell.dataset.day;
-        const valore = parseFloat(cell.innerText) || 0;
 
         if (!speseData[day]) speseData[day] = {};
         speseData[day][cat] = valore;
 
+        calcolaKmGiornalieri();
         aggiornaCalcoli();
     });
 
@@ -89,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     caricaBtn.addEventListener('click', () => {
         const settimana = settimanaInput.value;
         if (!settimana) { alert("Inserisci un numero di settimana valido!"); return; }
-        
+
         const datiSalvati = localStorage.getItem(`NotaSpese_${settimana}`);
         if (!datiSalvati) { alert(`Nessun dato trovato per la settimana ${settimana}`); return; }
 
@@ -100,8 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
         firmaDirezioneInput.value = dati.firmaDirezione || '';
         firmaDipendenteInput.value = dati.firmaDipendente || '';
         speseData = dati.speseData || {};
-        
-        ripristinaCelle();
+
+        // Ripristina i valori nella tabella
+        Object.keys(speseData).forEach(giorno => {
+            Object.keys(speseData[giorno]).forEach(cat => {
+                const cell = document.querySelector(`td[data-cat="${cat}"][data-day="${giorno}"]`);
+                if (cell) cell.innerText = speseData[giorno][cat];
+            });
+        });
+
+        calcolaKmGiornalieri();
+        aggiornaCalcoli();
         alert(`Settimana ${settimana} caricata con successo!`);
     });
 
