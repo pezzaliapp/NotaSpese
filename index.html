@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
   
-  <!-- Foglio di stile -->
+  <!-- Collegamento al foglio di stile -->
   <link rel="stylesheet" href="style.css" />
-
+  
   <!-- Manifest per la PWA -->
   <link rel="manifest" href="manifest.json" />
 </head>
@@ -34,12 +34,13 @@
     </div>
   </section>
 
-  <!-- Tabella Stile Excel -->
+  <!-- Tabella Principale (stile Excel) -->
   <section>
     <table id="table-spese">
       <thead>
         <tr>
           <th>Categoria / Sottocategoria</th>
+          <!-- Le intestazioni dei giorni verranno aggiornate automaticamente -->
           <th>Lunedì</th>
           <th>Martedì</th>
           <th>Mercoledì</th>
@@ -292,6 +293,7 @@
           <td colspan="7"></td>
           <td class="carburante-week-tot">0</td>
         </tr>
+
       </tbody>
       <tfoot>
         <tr>
@@ -303,7 +305,7 @@
     </table>
   </section>
 
-  <!-- SEZIONE NOTE E FIRME -->
+  <!-- Sezione Note e Firme -->
   <section>
     <div class="riga-dati">
       <label for="note">Note:</label>
@@ -317,7 +319,7 @@
     </div>
   </section>
 
-  <!-- SEZIONE PULSANTI -->
+  <!-- Sezione Pulsanti -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
@@ -327,7 +329,7 @@
   <!-- Script principale -->
   <script src="app.js"></script>
 
-  <!-- Registrazione Service Worker per la PWA -->
+  <!-- Registrazione Service Worker per PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
