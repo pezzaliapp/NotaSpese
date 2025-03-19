@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-
-  <!-- Collegamento foglio di stile -->
+  <!-- style.css facoltativo, puoi anche incorporare lo stile qui -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Collegamento Manifest PWA -->
   <link rel="manifest" href="manifest.json" />
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <h1>Nota Spese Trasferta</h1>
   </header>
 
-  <!-- SEZIONE DATI GENERALI -->
+  <!-- DATI GENERALI -->
   <section>
     <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
@@ -37,7 +33,7 @@
     </div>
   </section>
 
-  <!-- TABELLA PRINCIPALE STILE EXCEL -->
+  <!-- TABELLA PRINCIPALE -->
   <section>
     <table id="table-spese">
       <thead>
@@ -53,10 +49,10 @@
           <th>Totale</th>
         </tr>
       </thead>
-
       <tbody>
+
         <!-- KM -->
-        <tr class="km-iniziali">
+        <tr>
           <td>Km Iniziali</td>
           <td contenteditable="true" data-cat="kmIni" data-day="lun"></td>
           <td contenteditable="true" data-cat="kmIni" data-day="mar"></td>
@@ -65,9 +61,9 @@
           <td contenteditable="true" data-cat="kmIni" data-day="ven"></td>
           <td contenteditable="true" data-cat="kmIni" data-day="sab"></td>
           <td contenteditable="true" data-cat="kmIni" data-day="dom"></td>
-          <td class="totale-riga km-ini-tot">0</td>
+          <td class="totale-riga">0</td>
         </tr>
-        <tr class="km-finali">
+        <tr>
           <td>Km Finali</td>
           <td contenteditable="true" data-cat="kmFin" data-day="lun"></td>
           <td contenteditable="true" data-cat="kmFin" data-day="mar"></td>
@@ -76,9 +72,9 @@
           <td contenteditable="true" data-cat="kmFin" data-day="ven"></td>
           <td contenteditable="true" data-cat="kmFin" data-day="sab"></td>
           <td contenteditable="true" data-cat="kmFin" data-day="dom"></td>
-          <td class="totale-riga km-fin-tot">0</td>
+          <td class="totale-riga">0</td>
         </tr>
-        <tr class="km-giornalieri">
+        <tr>
           <td>Km giornalieri</td>
           <td data-cat="kmDiff" data-day="lun"></td>
           <td data-cat="kmDiff" data-day="mar"></td>
@@ -87,15 +83,15 @@
           <td data-cat="kmDiff" data-day="ven"></td>
           <td data-cat="kmDiff" data-day="sab"></td>
           <td data-cat="kmDiff" data-day="dom"></td>
-          <td class="totale-riga km-diff-tot">0</td>
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
-          <td class="totale-blocco">Totale Km Settimana</td>
+          <td><strong>Totale Km Settimana</strong></td>
           <td colspan="7"></td>
           <td class="km-sett-tot">0</td>
         </tr>
 
-        <!-- SPESE VIAGGIO -->
+        <!-- Spese Viaggio -->
         <tr>
           <td>Parcheggi</td>
           <td contenteditable="true" data-cat="parcheggi" data-day="lun"></td>
@@ -162,7 +158,7 @@
           <td contenteditable="true" data-cat="viaggioAltro" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
-        <tr class="sp-viaggio-subtot">
+        <tr>
           <td class="totale-blocco">Subtotale giornaliero Spese Viaggio</td>
           <td data-cat="spViaggioDay" data-day="lun"></td>
           <td data-cat="spViaggioDay" data-day="mar"></td>
@@ -171,10 +167,10 @@
           <td data-cat="spViaggioDay" data-day="ven"></td>
           <td data-cat="spViaggioDay" data-day="sab"></td>
           <td data-cat="spViaggioDay" data-day="dom"></td>
-          <td class="totale-blocco sp-viaggio-total">0</td>
+          <td class="totale-blocco">0</td>
         </tr>
 
-        <!-- ALLOGGIO E PASTI -->
+        <!-- Alloggio e Pasti -->
         <tr>
           <td>Alloggio</td>
           <td contenteditable="true" data-cat="alloggio" data-day="lun"></td>
@@ -250,10 +246,10 @@
           <td data-cat="alloggioDay" data-day="ven"></td>
           <td data-cat="alloggioDay" data-day="sab"></td>
           <td data-cat="alloggioDay" data-day="dom"></td>
-          <td class="totale-blocco alloggio-total">0</td>
+          <td class="totale-blocco">0</td>
         </tr>
 
-        <!-- CARBURANTE (Carta ENI) -->
+        <!-- Carburante (Carta ENI) -->
         <tr>
           <td>Carburante (Carta ENI)</td>
           <td contenteditable="true" data-cat="cartaEni" data-day="lun"></td>
@@ -274,10 +270,10 @@
           <td data-cat="carbEniDay" data-day="ven"></td>
           <td data-cat="carbEniDay" data-day="sab"></td>
           <td data-cat="carbEniDay" data-day="dom"></td>
-          <td class="totale-blocco carburante-total">0</td>
+          <td class="totale-blocco">0</td>
         </tr>
-      </tbody>
 
+      </tbody>
       <tfoot>
         <tr>
           <td><strong>TOTALE SETTIMANA</strong></td>
@@ -312,7 +308,7 @@
   <!-- Script principale -->
   <script src="app.js"></script>
 
-  <!-- Service worker per PWA -->
+  <!-- Registrazione service worker (PWA) -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
