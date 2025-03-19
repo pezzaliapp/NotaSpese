@@ -11,7 +11,7 @@
 body {
   font-family: Arial, sans-serif;
   background: #f0f0f0;
-  font-size: 14px; /* Ridotto per far stare più testo in larghezza */
+  font-size: 14px; /* Dimensione base ridotta per far stare più testo in larghezza */
 }
 
 /* Header */
@@ -55,7 +55,7 @@ textarea {
   border-radius: 4px;
 }
 
-/* Contenitore per la tabella (ora senza overflow-x) */
+/* Contenitore per la tabella (senza scroll) */
 .table-container {
   width: 100%;
   margin-top: 1rem;
@@ -64,16 +64,16 @@ textarea {
 
 /* Tabella che si adatta in larghezza fissa (no scroll) */
 table {
-  width: 100%;               /* la tabella riempie tutto lo spazio */
-  table-layout: fixed;       /* le colonne hanno larghezza fissa */
+  width: 100%;               /* La tabella riempie tutto lo spazio disponibile */
+  table-layout: fixed;       /* Le colonne hanno larghezza fissa */
   border-collapse: collapse;
-  font-size: 0.8rem;         /* font più piccolo per guadagnare spazio */
+  font-size: 0.8rem;         /* Font più piccolo per guadagnare spazio */
 }
 
 /* Assegna percentuali di larghezza alle 9 colonne:
-   1) Categoria: 20%
-   2-8) Lunedì-Domenica: 10% ciascuna
-   9) Totale: 10%
+   - 1° colonna (Categorie): 20%
+   - Colonne da 2 a 8 (Lunedì-Domenica): 10% ciascuna
+   - 9° colonna (Totale): 10%
 */
 table th:nth-child(1),
 table td:nth-child(1) {
@@ -105,40 +105,31 @@ table th, table td {
   border: 1px solid #ccc;
   padding: 0.3rem 0.4rem;
   text-align: center;
-  /* Se vuoi far andare a capo il testo che eccede la larghezza, usa: */
+  /* Permette al testo di andare a capo */
   white-space: normal;
   word-wrap: break-word;
 }
 
-/* Intestazione */
+/* Intestazione della tabella */
 table thead {
   background: #eaeaea;
 }
 
-/* Totali e subtotali */
-table .totale-riga {
-  background: #a9a9a9;  /* grigio scuro */
-  font-weight: bold;
-  color: #fff;
-}
-
-table .totale-blocco {
-  background: #a9a9a9;  /* grigio scuro */
-  font-weight: bold;
-  color: #fff;
-}
-
-table tfoot tr {
-  background: #a9a9a9;  /* grigio scuro */
-  font-weight: bold;
-  color: #fff;
-}
-
-/* Subtotali giornalieri in colore azzurro chiaro */
+/* SUBTOTALI (colore gradiente più chiaro) */
 table .sp-viaggio-subtot,
 table .alloggio-pasti-subtot,
 table .carburante-subtot {
-  background: #cce4f7;
+  background: linear-gradient(to right, #cce4f7, #b2d8f7);
+  color: #000;
+  font-weight: bold;
+}
+
+/* TOTALI (colore gradiente più scuro) */
+table .totale-riga,
+table .totale-blocco,
+table tfoot tr {
+  background: linear-gradient(to right, #a9a9a9, #888888);
+  color: #fff;
   font-weight: bold;
 }
 
