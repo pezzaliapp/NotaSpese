@@ -4,39 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-
-  <!-- Collegamento a style.css -->
+  
+  <!-- Foglio di stile -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Manifest PWA -->
+  <!-- Manifest per la PWA -->
   <link rel="manifest" href="manifest.json" />
 </head>
 <body>
-
   <header>
     <h1>Nota Spese Trasferta</h1>
   </header>
 
-  <!-- DATI GENERALI -->
+  <!-- Sezione Dati Generali -->
   <section>
     <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
-      <input type="text" id="dipendente" placeholder="Nome Dipendente" />
-
+      <input type="text" id="dipendente" placeholder="Nome Dipendente">
+      
       <label for="targa">Targa Automezzo:</label>
-      <input type="text" id="targa" placeholder="Targa Automezzo" />
-
-      <label for="num-settimana">N. Settimana:</label>
-      <input type="number" id="num-settimana" min="1" max="52" />
+      <input type="text" id="targa" placeholder="Targa Automezzo">
+      
+      <label for="num-settimana">N. Settimana (ww/yyyy):</label>
+      <input type="text" id="num-settimana" placeholder="11/2025">
     </div>
-
     <div class="riga-dati">
       <button id="carica-settimana">Carica Settimana</button>
       <button id="salva-settimana">Salva Settimana</button>
     </div>
   </section>
 
-  <!-- TABELLA PRINCIPALE -->
+  <!-- Tabella Stile Excel -->
   <section>
     <table id="table-spese">
       <thead>
@@ -53,8 +51,7 @@
         </tr>
       </thead>
       <tbody>
-
-        <!-- KM -->
+        <!-- Blocco KM -->
         <tr>
           <td>Km Iniziali</td>
           <td contenteditable="true" data-cat="kmIni" data-day="lun"></td>
@@ -89,12 +86,12 @@
           <td class="totale-riga">0</td>
         </tr>
         <tr>
-          <td><strong>Totale Km Settimana</strong></td>
+          <td class="totale-blocco"><strong>Totale Km Settimana</strong></td>
           <td colspan="7"></td>
           <td class="km-sett-tot">0</td>
         </tr>
 
-        <!-- SPESE VIAGGIO -->
+        <!-- Blocco Spese Viaggio -->
         <tr>
           <td>Parcheggi</td>
           <td contenteditable="true" data-cat="parcheggi" data-day="lun"></td>
@@ -161,7 +158,6 @@
           <td contenteditable="true" data-cat="viaggioAltro" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
-
         <!-- Subtotale giornaliero Spese Viaggio -->
         <tr class="sp-viaggio-subtot">
           <td class="totale-blocco">Subtotale giornaliero Spese Viaggio</td>
@@ -174,7 +170,6 @@
           <td data-cat="spViaggioDay" data-day="dom"></td>
           <td class="totale-blocco">0</td>
         </tr>
-
         <!-- Totale Spese Viaggio Settimana -->
         <tr>
           <td><strong>Totale Spese Viaggio Settimana</strong></td>
@@ -182,7 +177,7 @@
           <td class="sp-viaggio-week-tot">0</td>
         </tr>
 
-        <!-- ALLOGGIO E PASTI -->
+        <!-- Blocco Alloggio e Pasti -->
         <tr>
           <td>Alloggio</td>
           <td contenteditable="true" data-cat="alloggio" data-day="lun"></td>
@@ -249,7 +244,6 @@
           <td contenteditable="true" data-cat="alloggioAltro" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
-
         <!-- Subtotale giornaliero Alloggio/Pasti -->
         <tr class="alloggio-pasti-subtot">
           <td class="totale-blocco">Subtotale giornaliero Alloggio/Pasti</td>
@@ -262,7 +256,6 @@
           <td data-cat="alloggioDay" data-day="dom"></td>
           <td class="totale-blocco">0</td>
         </tr>
-
         <!-- Totale Alloggio/Pasti Settimana -->
         <tr>
           <td><strong>Totale Alloggio/Pasti Settimana</strong></td>
@@ -270,7 +263,7 @@
           <td class="alloggio-week-tot">0</td>
         </tr>
 
-        <!-- CARBURANTE (Carta ENI) -->
+        <!-- Blocco Carburante (Carta ENI) -->
         <tr>
           <td>Carburante (Carta ENI)</td>
           <td contenteditable="true" data-cat="cartaEni" data-day="lun"></td>
@@ -293,14 +286,12 @@
           <td data-cat="carbEniDay" data-day="dom"></td>
           <td class="totale-blocco">0</td>
         </tr>
-
         <!-- Totale Carburante ENI Settimana -->
         <tr>
           <td><strong>Totale Carburante ENI Settimana</strong></td>
           <td colspan="7"></td>
           <td class="carburante-week-tot">0</td>
         </tr>
-
       </tbody>
       <tfoot>
         <tr>
@@ -312,7 +303,7 @@
     </table>
   </section>
 
-  <!-- NOTE E FIRME -->
+  <!-- SEZIONE NOTE E FIRME -->
   <section>
     <div class="riga-dati">
       <label for="note">Note:</label>
@@ -320,13 +311,13 @@
     </div>
     <div class="riga-dati">
       <label for="firma-direzione">Visto Direzione:</label>
-      <input type="text" id="firma-direzione" placeholder="Firma Direzione" />
+      <input type="text" id="firma-direzione" placeholder="Firma Direzione">
       <label for="firma-dipendente">Firma Dipendente:</label>
-      <input type="text" id="firma-dipendente" placeholder="Firma Dipendente" />
+      <input type="text" id="firma-dipendente" placeholder="Firma Dipendente">
     </div>
   </section>
 
-  <!-- PULSANTI -->
+  <!-- SEZIONE PULSANTI -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
@@ -336,7 +327,7 @@
   <!-- Script principale -->
   <script src="app.js"></script>
 
-  <!-- Registrazione service worker (PWA) -->
+  <!-- Registrazione Service Worker per la PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
