@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
   <style>
-    /* Esempio di stile di base */
     body { font-family: Arial, sans-serif; margin:0; background:#f0f0f0; }
     header { background:#1976d2; color:#fff; text-align:center; padding:1rem; }
     section {
-      background:#fff; margin:1rem auto; padding:1rem; max-width:900px; 
+      background:#fff; margin:1rem auto; padding:1rem; max-width:900px;
       border-radius:6px; box-shadow:0 0 6px rgba(0,0,0,0.1);
     }
     .riga-dati, .riga-giornaliera {
@@ -23,18 +22,46 @@
     button {
       padding:0.4rem 0.8rem; border:none; border-radius:4px; cursor:pointer;
     }
-    table {
-      width:100%; border-collapse:collapse; margin-top:1rem;
+    /* Stile container verticale voci */
+    #riepilogo-container {
+      display: flex; 
+      flex-direction: column; 
+      gap: 1rem;
     }
-    table th, table td {
-      border:1px solid #ccc; padding:0.5rem; text-align:left;
+    .voce-card {
+      border:1px solid #ccc; 
+      padding:1rem; 
+      border-radius:4px;
+      background:#fafafa;
+      position:relative;
     }
-    table tbody tr:hover { background:#fafafa; }
-    #totale-settimanale { margin-top:1rem; font-weight:bold; }
+    .voce-card h3 {
+      margin-top:0; 
+      margin-bottom:0.5rem;
+    }
+    .voce-card .foto-preview {
+      max-width:100px; 
+      max-height:80px; 
+      display:block; 
+      margin:0.5rem 0;
+    }
+    .voce-card .azioni {
+      position:absolute; 
+      top:1rem; 
+      right:1rem;
+      display:flex; 
+      gap:0.5rem;
+    }
+    #totale-settimanale {
+      margin-top:1rem; 
+      font-weight:bold;
+    }
     #esporta-stampa {
-      display:flex; gap:1rem; justify-content:center; margin-top:1rem;
+      display:flex; 
+      gap:1rem; 
+      justify-content:center; 
+      margin-top:1rem;
     }
-    h2 { margin-top:0; }
   </style>
 </head>
 <body>
@@ -62,7 +89,7 @@
     </div>
   </section>
 
-  <!-- SEZIONE INSERIMENTO VOCI -->
+  <!-- INSERIMENTO VOCI -->
   <section>
     <h2>Inserisci Voce</h2>
     <div class="riga-giornaliera">
@@ -94,56 +121,21 @@
       <label for="valore-voce">Valore:</label>
       <input type="number" id="valore-voce" placeholder="0" />
 
+      <!-- Input per allegato foto -->
+      <label for="allegato">Allegato:</label>
+      <!-- accept="image/*;capture=camera" per scattare foto su mobile -->
+      <input type="file" id="allegato" accept="image/*;capture=camera" />
+
       <button id="aggiungi-voce">Aggiungi</button>
     </div>
   </section>
 
-  <!-- TABELLA DI EDITING (con Azioni Modifica/Elimina) -->
+  <!-- RIEPILOGO VERTICALE -->
   <section>
-    <h2>Elenco Voci (per modifiche) - con Settimana</h2>
-    <table id="riepilogo-table">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Giorno</th>
-          <th>Settimana</th>
-          <th>Descrizione</th>
-          <th>Categoria</th>
-          <th>SottoCat</th>
-          <th>Valore</th>
-          <th>Diff Km</th>
-          <th>Azioni</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
+    <h2>Elenco Voci (verticale, con allegati)</h2>
+    <div id="riepilogo-container"><!-- popolato da app.js --></div>
     <div id="totale-settimanale">
       Totale Spese (no Km): <span id="somma-settimanale">0.00</span>
-    </div>
-  </section>
-
-  <!-- REPORT FINALE (raggruppato per data) -->
-  <section>
-    <h2>Report Settimanale (in ordine di data)</h2>
-    <table id="report-table">
-      <thead>
-        <tr>
-          <th>Settimana</th>
-          <th>Data</th>
-          <th>Giorno</th>
-          <th>Descrizione</th>
-          <th>Km Iniziali</th>
-          <th>Km Finali</th>
-          <th>Diff Km Giorno</th>
-          <th>Spese (subtot)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <div id="report-totali" style="margin-top:1rem; font-weight:bold;">
-      <!-- Totale Km e Spese finali -->
     </div>
   </section>
 
