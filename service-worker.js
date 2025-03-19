@@ -1,5 +1,5 @@
 // service-worker.js
-const CACHE_NAME = 'nota-spese-cache-v1';
+const CACHE_NAME = 'nota-spese-cache-v2';
 const URLS_TO_CACHE = [
   'index.html',
   'style.css',
@@ -9,7 +9,7 @@ const URLS_TO_CACHE = [
   'icon/NotaSpese-512.png'
 ];
 
-// Install SW
+// Install
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -18,7 +18,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate SW
+// Activate
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -36,9 +36,9 @@ self.addEventListener('activate', (event) => {
 // Fetch
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Se esiste risposta in cache la ritorna, altrimenti fetch normale
-      return response || fetch(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      // Se esiste in cache, lo restituiamo subito; altrimenti fetch normale
+      return cachedResponse || fetch(event.request);
     })
   );
 });
