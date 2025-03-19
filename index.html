@@ -4,73 +4,54 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
+
+  <!-- Collegamento a style.css se preferisci un file separato -->
   <style>
     body { font-family: Arial, sans-serif; margin:0; background:#f0f0f0; }
     header { background:#1976d2; color:#fff; text-align:center; padding:1rem; }
     section {
-      background:#fff; margin:1rem auto; padding:1rem; max-width:900px;
+      background:#fff; margin:1rem auto; padding:1rem; max-width:1200px;
       border-radius:6px; box-shadow:0 0 6px rgba(0,0,0,0.1);
     }
-    .riga-dati, .riga-giornaliera {
-      display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;
+    .riga-dati {
+      display:flex; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;
     }
     label { font-weight:bold; min-width:max-content; }
-    input[type="text"], input[type="date"], input[type="number"],
-    select, textarea {
+    input[type="text"], input[type="number"], select, textarea {
       padding:0.3rem 0.5rem; border:1px solid #ccc; border-radius:4px;
+    }
+    table {
+      width:100%; border-collapse:collapse; margin-top:1rem;
+    }
+    table th, table td {
+      border:1px solid #ccc; padding:0.5rem; text-align:center;
+    }
+    thead {
+      background:#eaeaea;
+    }
+    tfoot tr {
+      background:#f9f9f9;
+      font-weight:bold;
     }
     button {
       padding:0.4rem 0.8rem; border:none; border-radius:4px; cursor:pointer;
     }
-    /* Stile container verticale voci */
-    #riepilogo-container {
-      display: flex; 
-      flex-direction: column; 
-      gap: 1rem;
-    }
-    .voce-card {
-      border:1px solid #ccc; 
-      padding:1rem; 
-      border-radius:4px;
-      background:#fafafa;
-      position:relative;
-    }
-    .voce-card h3 {
-      margin-top:0; 
-      margin-bottom:0.5rem;
-    }
-    .voce-card .foto-preview {
-      max-width:100px; 
-      max-height:80px; 
-      display:block; 
-      margin:0.5rem 0;
-    }
-    .voce-card .azioni {
-      position:absolute; 
-      top:1rem; 
-      right:1rem;
-      display:flex; 
-      gap:0.5rem;
-    }
-    #totale-settimanale {
+    #report-container {
       margin-top:1rem; 
-      font-weight:bold;
+      overflow-x:auto; /* se serve scroll orizzontale */
     }
     #esporta-stampa {
-      display:flex; 
-      gap:1rem; 
-      justify-content:center; 
-      margin-top:1rem;
+      display:flex; gap:0.5rem; margin-top:1rem; justify-content:center;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Nota Spese Trasferta</h1>
+    <h1>Nota Spese Trasferta (stile Excel)</h1>
   </header>
 
-  <!-- SEZIONE DATI GENERALI E GESTIONE SETTIMANA -->
+  <!-- DATI GENERALI / GESTIONE SETTIMANA -->
   <section>
     <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
@@ -78,72 +59,139 @@
 
       <label for="targa">Targa Automezzo:</label>
       <input type="text" id="targa" placeholder="Targa automezzo" />
+
+      <label for="numero-settimana">Settimana n.:</label>
+      <input type="number" id="numero-settimana" min="1" max="52" />
     </div>
 
     <div class="riga-dati">
-      <label for="numero-settimana">N. Settimana:</label>
-      <input type="number" id="numero-settimana" min="1" max="52" placeholder="Es. 10" />
-
       <button id="carica-settimana">Carica Settimana</button>
       <button id="salva-settimana">Salva Settimana</button>
     </div>
   </section>
 
-  <!-- INSERIMENTO VOCI -->
-  <section>
-    <h2>Inserisci Voce</h2>
-    <div class="riga-giornaliera">
-      <label for="data-giorno">Data:</label>
-      <input type="date" id="data-giorno" />
+  <!-- TABELLA STILE EXCEL -->
+  <section id="report-container">
+    <table id="table-excel">
+      <thead>
+        <!-- Prima riga con i giorni + TOT -->
+        <tr>
+          <th>Categoria</th>
+          <th>Lunedì</th>
+          <th>Martedì</th>
+          <th>Mercoledì</th>
+          <th>Giovedì</th>
+          <th>Venerdì</th>
+          <th>Sabato</th>
+          <th>Domenica</th>
+          <th>Totale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Blocchi. Esempio: KM -->
+        <tr class="km-iniziali">
+          <td>Km Iniziali</td>
+          <td contenteditable="true" data-cat="kmIni" data-day="lun"></td>
+          <td contenteditable="true" data-cat="kmIni" data-day="mar"></td>
+          <td contenteditable="true" data-cat="kmIni" data-day="mer"></td>
+          <td contenteditable="true" data-cat="kmIni" data-day="gio"></td>
+          <td contenteditable="true" data-cat="kmIni" data-day="ven"></td>
+          <td contenteditable="true" data-cat="kmIni" data-day="sab"></td>
+          <td contenteditable="true" data-cat="kmIni" data-day="dom"></td>
+          <td class="totale-riga">0</td>
+        </tr>
+        <tr class="km-finali">
+          <td>Km Finali</td>
+          <td contenteditable="true" data-cat="kmFin" data-day="lun"></td>
+          <td contenteditable="true" data-cat="kmFin" data-day="mar"></td>
+          <td contenteditable="true" data-cat="kmFin" data-day="mer"></td>
+          <td contenteditable="true" data-cat="kmFin" data-day="gio"></td>
+          <td contenteditable="true" data-cat="kmFin" data-day="ven"></td>
+          <td contenteditable="true" data-cat="kmFin" data-day="sab"></td>
+          <td contenteditable="true" data-cat="kmFin" data-day="dom"></td>
+          <td class="totale-riga">0</td>
+        </tr>
+        <tr class="km-diff">
+          <td>Km Giornalieri</td>
+          <td data-cat="kmDiff" data-day="lun"></td>
+          <td data-cat="kmDiff" data-day="mar"></td>
+          <td data-cat="kmDiff" data-day="mer"></td>
+          <td data-cat="kmDiff" data-day="gio"></td>
+          <td data-cat="kmDiff" data-day="ven"></td>
+          <td data-cat="kmDiff" data-day="sab"></td>
+          <td data-cat="kmDiff" data-day="dom"></td>
+          <td class="totale-riga">0</td>
+        </tr>
+        <tr class="tot-km">
+          <td><strong>Totale KM</strong></td>
+          <td colspan="7"></td>
+          <td class="totale-blocco-km">0</td>
+        </tr>
 
-      <label for="giorno-settimana">Giorno:</label>
-      <input type="text" id="giorno-settimana" readonly />
+        <!-- Spese Viaggio (esempio) -->
+        <tr class="spese-parcheggi">
+          <td>Parcheggi</td>
+          <td contenteditable="true" data-cat="parcheggi" data-day="lun"></td>
+          <td contenteditable="true" data-cat="parcheggi" data-day="mar"></td>
+          <td contenteditable="true" data-cat="parcheggi" data-day="mer"></td>
+          <td contenteditable="true" data-cat="parcheggi" data-day="gio"></td>
+          <td contenteditable="true" data-cat="parcheggi" data-day="ven"></td>
+          <td contenteditable="true" data-cat="parcheggi" data-day="sab"></td>
+          <td contenteditable="true" data-cat="parcheggi" data-day="dom"></td>
+          <td class="totale-riga">0</td>
+        </tr>
+        <!-- ... altre righe per NoleggioAuto, Taxi, etc. ... -->
 
-      <label for="settimana-auto">Settimana (auto):</label>
-      <input type="text" id="settimana-auto" readonly />
+        <tr class="spese-viaggio-total">
+          <td><strong>Totale Spese Viaggio</strong></td>
+          <td colspan="7"></td>
+          <td class="totale-blocco-viaggio">0</td>
+        </tr>
 
-      <label for="descrizione-giorno">Desc. Giorno:</label>
-      <input type="text" id="descrizione-giorno" placeholder="Sede, Trasferta, ecc." />
+        <!-- Alloggio e Pasti -->
+        <tr>
+          <td>Alloggio</td>
+          <td contenteditable="true" data-cat="alloggio" data-day="lun"></td>
+          <!-- ... -->
+          <td class="totale-riga">0</td>
+        </tr>
+        <!-- ... Altre righe: Colazione, Pranzo, Cena, etc. ... -->
 
-      <label for="categoria">Categoria:</label>
-      <select id="categoria">
-        <option value="">-- Seleziona --</option>
-        <option value="km">Km</option>
-        <option value="spese-viaggio">Spese Viaggio</option>
-        <option value="alloggio-pasti">Alloggio e Pasti</option>
-        <option value="carburante">Carburante</option>
-      </select>
+        <tr class="alloggio-pasti-total">
+          <td><strong>Totale Alloggio e Pasti</strong></td>
+          <td colspan="7"></td>
+          <td class="totale-blocco-alloggio">0</td>
+        </tr>
 
-      <select id="sottocategoria">
-        <option value="">-- Sottocategoria --</option>
-      </select>
-
-      <label for="valore-voce">Valore:</label>
-      <input type="number" id="valore-voce" placeholder="0" />
-
-      <!-- Input per allegato foto -->
-      <label for="allegato">Allegato:</label>
-      <!-- accept="image/*;capture=camera" per scattare foto su mobile -->
-      <input type="file" id="allegato" accept="image/*;capture=camera" />
-
-      <button id="aggiungi-voce">Aggiungi</button>
-    </div>
-  </section>
-
-  <!-- RIEPILOGO VERTICALE -->
-  <section>
-    <h2>Elenco Voci (verticale, con allegati)</h2>
-    <div id="riepilogo-container"><!-- popolato da app.js --></div>
-    <div id="totale-settimanale">
-      Totale Spese (no Km): <span id="somma-settimanale">0.00</span>
-    </div>
+        <!-- Carburante -->
+        <tr>
+          <td>Carburante (Carta ENI)</td>
+          <!-- 7 celle editabili, tot riga -->
+          <td contenteditable="true" data-cat="carburanteENI" data-day="lun"></td>
+          <!-- ... -->
+          <td class="totale-riga">0</td>
+        </tr>
+        <tr class="carburante-total">
+          <td><strong>Totale Carburante</strong></td>
+          <td colspan="7"></td>
+          <td class="totale-blocco-carburante">0</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><strong>TOTALE SPESE SETTIMANA</strong></td>
+          <td colspan="7"></td>
+          <td class="totale-settimana">0</td>
+        </tr>
+      </tfoot>
+    </table>
   </section>
 
   <!-- NOTE E FIRME -->
   <section>
     <div class="riga-dati">
       <label for="note">Note:</label>
-      <textarea id="note" rows="2" style="flex:1;"></textarea>
+      <textarea id="note" rows="3" style="flex:1;"></textarea>
     </div>
     <div class="riga-dati">
       <label for="firma-direzione">Visto Direzione:</label>
