@@ -11,7 +11,7 @@
 body {
   font-family: Arial, sans-serif;
   background: #f0f0f0;
-  font-size: 14px; /* Dimensione base ridotta per far stare più testo in larghezza */
+  font-size: 14px; /* Dimensione base per una buona leggibilità */
 }
 
 /* Header */
@@ -55,23 +55,23 @@ textarea {
   border-radius: 4px;
 }
 
-/* Contenitore per la tabella (senza scroll) */
+/* Contenitore per la tabella */
 .table-container {
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
-/* Tabella che si adatta in larghezza fissa (no scroll) */
+/* Tabella con layout fisso (niente scroll orizzontale) */
 table {
-  width: 100%;               /* La tabella riempie tutto lo spazio disponibile */
+  width: 100%;               /* La tabella riempie tutto lo spazio */
   table-layout: fixed;       /* Le colonne hanno larghezza fissa */
   border-collapse: collapse;
-  font-size: 0.8rem;         /* Font più piccolo per guadagnare spazio */
+  font-size: 0.8rem;         /* Font un po' più piccolo */
 }
 
 /* Assegna percentuali di larghezza alle 9 colonne:
-   - 1° colonna (Categorie): 20%
+   - 1° colonna (Categoria): 20%
    - Colonne da 2 a 8 (Lunedì-Domenica): 10% ciascuna
    - 9° colonna (Totale): 10%
 */
@@ -101,7 +101,8 @@ table td:nth-child(9) {
 }
 
 /* Celle tabella */
-table th, table td {
+table th,
+table td {
   border: 1px solid #ccc;
   padding: 0.3rem 0.4rem;
   text-align: center;
@@ -123,7 +124,14 @@ table .carburante-subtot {
   font-weight: bold;
 }
 
-/* TOTALI (righe totali con gradiente verticale, colore più scuro) */
+/* RIGHE TOTALI (gradiente verticale, colore più scuro) */
+table .totale-riga {
+  background: linear-gradient(to bottom, #a9a9a9, #888888);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Se usi anche .totale-blocco o vuoi estendere al tfoot, puoi unire:
 table .totale-riga,
 table .totale-blocco,
 table tfoot tr {
@@ -131,6 +139,7 @@ table tfoot tr {
   color: #fff;
   font-weight: bold;
 }
+*/
 
 /* Pulsanti */
 button {
