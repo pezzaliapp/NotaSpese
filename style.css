@@ -11,7 +11,7 @@
 body {
   font-family: Arial, sans-serif;
   background: #f0f0f0;
-  font-size: 16px; /* Dimensione di base; puoi ridurre se vuoi un testo più piccolo */
+  font-size: 14px; /* Ridotto per far stare più testo in larghezza */
 }
 
 /* Header */
@@ -22,7 +22,7 @@ header {
   padding: 1rem;
 }
 
-/* Sezioni con layout centrato */
+/* Sezioni */
 section {
   width: 95%;
   max-width: 1200px;
@@ -55,27 +55,59 @@ textarea {
   border-radius: 4px;
 }
 
-/* Contenitore per la tabella: scroll orizzontale se serve */
+/* Contenitore per la tabella (ora senza overflow-x) */
 .table-container {
   width: 100%;
-  overflow-x: auto; /* abilita scrollbar orizzontale */
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
-/* Tabella */
+/* Tabella che si adatta in larghezza fissa (no scroll) */
 table {
-  min-width: 1000px; /* assicura che tutte le colonne stiano su una riga */
+  width: 100%;               /* la tabella riempie tutto lo spazio */
+  table-layout: fixed;       /* le colonne hanno larghezza fissa */
   border-collapse: collapse;
-  font-size: 0.9rem; /* font leggermente più piccolo per ridurre altezza riga */
+  font-size: 0.8rem;         /* font più piccolo per guadagnare spazio */
+}
+
+/* Assegna percentuali di larghezza alle 9 colonne:
+   1) Categoria: 20%
+   2-8) Lunedì-Domenica: 10% ciascuna
+   9) Totale: 10%
+*/
+table th:nth-child(1),
+table td:nth-child(1) {
+  width: 20%;
+}
+table th:nth-child(2),
+table td:nth-child(2),
+table th:nth-child(3),
+table td:nth-child(3),
+table th:nth-child(4),
+table td:nth-child(4),
+table th:nth-child(5),
+table td:nth-child(5),
+table th:nth-child(6),
+table td:nth-child(6),
+table th:nth-child(7),
+table td:nth-child(7),
+table th:nth-child(8),
+table td:nth-child(8) {
+  width: 10%;
+}
+table th:nth-child(9),
+table td:nth-child(9) {
+  width: 10%;
 }
 
 /* Celle tabella */
-table th,
-table td {
+table th, table td {
   border: 1px solid #ccc;
-  padding: 0.3rem 0.4rem; /* meno padding => righe più basse */
+  padding: 0.3rem 0.4rem;
   text-align: center;
+  /* Se vuoi far andare a capo il testo che eccede la larghezza, usa: */
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 /* Intestazione */
@@ -126,14 +158,12 @@ button {
   justify-content: center;
 }
 
-/* Media query per schermi più piccoli */
-@media (max-width: 768px) {
-  table {
-    font-size: 0.8rem;
-    min-width: 900px; /* riduci se preferisci meno scroll */
+/* Stampa: riduci ulteriormente il font per far entrare tutto in pagina */
+@media print {
+  body {
+    font-size: 10px;
   }
-  table th,
-  table td {
-    padding: 0.2rem 0.3rem;
+  table {
+    font-size: 9px;
   }
 }
