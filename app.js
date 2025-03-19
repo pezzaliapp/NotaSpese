@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ========================
   function aggiornaDateSettimana(week, year) {
     const monday = getMondayOfISOWeek(week, year);
-    const nomiGiorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
 
     for (let i = 0; i < 7; i++) {
       let currentDate = new Date(monday);
@@ -64,11 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const dd = currentDate.getDate().toString().padStart(2, '0');
       const mm = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-      const formattedDate = `${dd}/${mm}`;
+      // Formattazione con anno (es. "03.03.2025")
+      const formattedDate = `${dd}.${mm}.${year}`;
 
-      const th = document.querySelector(`#table-spese thead tr th:nth-child(${i + 2})`);
+      const th = document.querySelector(`#date-row th:nth-child(${i + 2})`);
       if (th) {
-        th.innerText = `${nomiGiorni[i]} (${formattedDate})`;
+        th.innerText = formattedDate;
       }
     }
   }
