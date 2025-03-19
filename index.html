@@ -39,9 +39,8 @@
     </div>
   </section>
 
-  <!-- TABELLA PRINCIPALE (senza scroll orizzontale) -->
+  <!-- TABELLA PRINCIPALE -->
   <section>
-    <!-- Puoi anche rimuovere del tutto il .table-container se non serve più -->
     <div class="table-container">
       <table id="table-spese">
         <thead>
@@ -117,7 +116,8 @@
             <td data-cat="kmDiff" data-day="dom"></td>
             <td class="totale-riga">0</td>
           </tr>
-          <tr>
+          <!-- Totale Km Settimana (con classe "totale-riga") -->
+          <tr class="totale-riga">
             <td><strong>Totale Km Settimana</strong></td>
             <td colspan="7"></td>
             <td class="km-sett-tot">0</td>
@@ -204,8 +204,8 @@
             <td class="totale-blocco">0</td>
           </tr>
 
-          <!-- Totale Spese Viaggio Settimana -->
-          <tr>
+          <!-- Totale Spese Viaggio Settimana (con classe "totale-riga") -->
+          <tr class="totale-riga">
             <td><strong>Totale Spese Viaggio Settimana</strong></td>
             <td colspan="7"></td>
             <td class="sp-viaggio-week-tot">0</td>
@@ -292,8 +292,8 @@
             <td class="totale-blocco">0</td>
           </tr>
 
-          <!-- Totale Alloggio/Pasti Settimana -->
-          <tr>
+          <!-- Totale Alloggio/Pasti Settimana (con classe "totale-riga") -->
+          <tr class="totale-riga">
             <td><strong>Totale Alloggio/Pasti Settimana</strong></td>
             <td colspan="7"></td>
             <td class="alloggio-week-tot">0</td>
@@ -323,15 +323,16 @@
             <td class="totale-blocco">0</td>
           </tr>
 
-          <!-- Totale Carburante ENI Settimana -->
-          <tr>
+          <!-- Totale Carburante ENI Settimana (con classe "totale-riga") -->
+          <tr class="totale-riga">
             <td><strong>Totale Carburante ENI Settimana</strong></td>
             <td colspan="7"></td>
             <td class="carburante-week-tot">0</td>
           </tr>
         </tbody>
         <tfoot>
-          <tr>
+          <!-- TOTALE SETTIMANA (anche qui classe "totale-riga") -->
+          <tr class="totale-riga">
             <td><strong>TOTALE SETTIMANA</strong></td>
             <td colspan="7"></td>
             <td class="totale-settimana">0</td>
