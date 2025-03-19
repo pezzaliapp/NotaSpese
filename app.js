@@ -12,56 +12,66 @@ document.addEventListener('DOMContentLoaded', () => {
     const stampaTxtBtn = document.getElementById('stampa-txt');
     const whatsappBtn = document.getElementById('condividi-whatsapp');
 
-    let speseData = {}; // Oggetto per memorizzare i dati
+    let speseData = {};
 
-    // 📌 Funzione per aggiornare i totali
+    // 📌 Funzione per aggiornare i calcoli
     function aggiornaCalcoli() {
-        let totaleKmSettimana = 0;
         let totaleSettimanale = 0;
+        let totaleKmSettimana = 0;
 
-        // Itera su tutte le righe della tabella
-        document.querySelectorAll("tr").forEach(row => {
-            let totaleRiga = 0;
+        const giorniSettimana = ["lun", "mar", "mer", "gio", "ven", "sab", "dom"];
 
-            // Prende tutte le celle della riga tranne l'ultima (Totale)
-            const celle = row.querySelectorAll("td[data-cat]");
-            celle.forEach(cella => {
-                let valore = parseFloat(cella.innerText) || 0;
-                totaleRiga += valore;
+        // **Categorie di spesa**
+        const categorieViaggio = ["parcheggi", "noleggio", "taxiBus", "biglietti", "carburCont", "viaggioAltro"];
+        const categorieAlloggio = ["alloggio", "colazione", "pranzo", "cena", "acquaCaffe", "alloggioAltro"];
+        const categorieCarburante = ["cartaEni"];
+
+        giorniSettimana.forEach(giorno => {
+            let subtotaleViaggio = 0;
+            let subtotaleAlloggio = 0;
+            let subtotaleCarburante = 0;
+
+            // **Calcolo subtotali per ogni categoria**
+            categorieViaggio.forEach(cat => {
+                let valore = parseFloat(speseData[giorno]?.[cat]) || 0;
+                subtotaleViaggio += valore;
             });
 
-            // Scrive il totale nella colonna "Totale"
-            const cellaTotale = row.querySelector(".totale-riga");
-            if (cellaTotale) {
-                cellaTotale.innerText = totaleRiga.toFixed(2);
-            }
+            categorieAlloggio.forEach(cat => {
+                let valore = parseFloat(speseData[giorno]?.[cat]) || 0;
+                subtotaleAlloggio += valore;
+            });
 
-            // Se la riga è dei Km, aggiorna anche il totale settimanale Km
-            if (row.classList.contains("km-giornalieri")) {
-                totaleKmSettimana += totaleRiga;
-            }
+            categorieCarburante.forEach(cat => {
+                let valore = parseFloat(speseData[giorno]?.[cat]) || 0;
+                subtotaleCarburante += valore;
+            });
 
-            // Somma al totale generale
-            totaleSettimanale += totaleRiga;
+            // **Aggiorna i subtotali giornalieri nella tabella**
+            document.querySelector(`td[data-cat="spViaggioDay"][data-day="${giorno}"]`).innerText = subtotaleViaggio.toFixed(2);
+            document.querySelector(`td[data-cat="alloggioDay"][data-day="${giorno}"]`).innerText = subtotaleAlloggio.toFixed(2);
+            document.querySelector(`td[data-cat="carbEniDay"][data-day="${giorno}"]`).innerText = subtotaleCarburante.toFixed(2);
+
+            // **Aggiunge i subtotali al totale settimanale**
+            totaleSettimanale += subtotaleViaggio + subtotaleAlloggio + subtotaleCarburante;
         });
 
-        // Aggiorna i totali
+        // **Calcolo Totale Km Settimana**
+        giorniSettimana.forEach(giorno => {
+            let kmIni = parseFloat(speseData[giorno]?.kmIni) || 0;
+            let kmFin = parseFloat(speseData[giorno]?.kmFin) || 0;
+            let kmDiff = kmFin - kmIni;
+
+            speseData[giorno].kmDiff = kmDiff;
+            totaleKmSettimana += kmDiff;
+
+            // **Aggiorna il valore della differenza Km**
+            document.querySelector(`td[data-cat="kmDiff"][data-day="${giorno}"]`).innerText = kmDiff.toFixed(2);
+        });
+
+        // **Aggiorna i totali nella tabella**
         document.querySelector(".km-sett-tot").innerText = totaleKmSettimana.toFixed(2);
         document.querySelector(".totale-settimana").innerText = totaleSettimanale.toFixed(2);
-    }
-
-    // 📌 Funzione per aggiornare le differenze Km Finali - Km Iniziali
-    function calcolaKmGiornalieri() {
-        ["lun", "mar", "mer", "gio", "ven", "sab", "dom"].forEach(giorno => {
-            const kmIni = parseFloat(document.querySelector(`td[data-cat="kmIni"][data-day="${giorno}"]`)?.innerText) || 0;
-            const kmFin = parseFloat(document.querySelector(`td[data-cat="kmFin"][data-day="${giorno}"]`)?.innerText) || 0;
-            const kmDiff = kmFin - kmIni;
-
-            const cellKmDiff = document.querySelector(`td[data-cat="kmDiff"][data-day="${giorno}"]`);
-            if (cellKmDiff) {
-                cellKmDiff.innerText = kmDiff.toFixed(2);
-            }
-        });
     }
 
     // 📌 Evento per modificare i valori nelle celle
@@ -74,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!speseData[day]) speseData[day] = {};
         speseData[day][cat] = valore;
 
-        calcolaKmGiornalieri();
         aggiornaCalcoli();
     });
 
@@ -94,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firmaDipendenteInput.value = dati.firmaDipendente || '';
         speseData = dati.speseData || {};
 
-        // Ripristina i valori nella tabella
+        // **Ripristina i valori nella tabella**
         Object.keys(speseData).forEach(giorno => {
             Object.keys(speseData[giorno]).forEach(cat => {
                 const cell = document.querySelector(`td[data-cat="${cat}"][data-day="${giorno}"]`);
@@ -102,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        calcolaKmGiornalieri();
         aggiornaCalcoli();
         alert(`Settimana ${settimana} caricata con successo!`);
     });
@@ -139,12 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         a.href = URL.createObjectURL(blob);
         a.download = `nota_spese_${settimana}.txt`;
         a.click();
-    });
-
-    // 📌 WhatsApp
-    whatsappBtn.addEventListener('click', () => {
-        let msg = `Nota Spese ${settimanaInput.value}: Dipendente ${dipendenteInput.value}, Targa ${targaInput.value}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     });
 
     aggiornaCalcoli();
