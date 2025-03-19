@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
 
-  <!-- Collegamento al foglio di stile -->
+  <!-- Collegamento foglio di stile -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Manifest per la PWA -->
+  <!-- Collegamento Manifest PWA -->
   <link rel="manifest" href="manifest.json" />
-
 </head>
 <body>
 
@@ -54,8 +53,8 @@
           <th>Totale</th>
         </tr>
       </thead>
-      <tbody>
 
+      <tbody>
         <!-- KM -->
         <tr class="km-iniziali">
           <td>Km Iniziali</td>
@@ -111,27 +110,56 @@
         <tr>
           <td>Noleggio Auto</td>
           <td contenteditable="true" data-cat="noleggio" data-day="lun"></td>
-          <!-- ... le altre 6 celle ... -->
+          <td contenteditable="true" data-cat="noleggio" data-day="mar"></td>
+          <td contenteditable="true" data-cat="noleggio" data-day="mer"></td>
+          <td contenteditable="true" data-cat="noleggio" data-day="gio"></td>
+          <td contenteditable="true" data-cat="noleggio" data-day="ven"></td>
+          <td contenteditable="true" data-cat="noleggio" data-day="sab"></td>
+          <td contenteditable="true" data-cat="noleggio" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Taxi / Autobus</td>
-          <!-- 7 celle contenteditable data-cat="taxiBus" data-day=... -->
+          <td contenteditable="true" data-cat="taxiBus" data-day="lun"></td>
+          <td contenteditable="true" data-cat="taxiBus" data-day="mar"></td>
+          <td contenteditable="true" data-cat="taxiBus" data-day="mer"></td>
+          <td contenteditable="true" data-cat="taxiBus" data-day="gio"></td>
+          <td contenteditable="true" data-cat="taxiBus" data-day="ven"></td>
+          <td contenteditable="true" data-cat="taxiBus" data-day="sab"></td>
+          <td contenteditable="true" data-cat="taxiBus" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Biglietti Aerei/Treni</td>
-          <!-- 7 celle data-cat="biglietti" ... -->
+          <td contenteditable="true" data-cat="biglietti" data-day="lun"></td>
+          <td contenteditable="true" data-cat="biglietti" data-day="mar"></td>
+          <td contenteditable="true" data-cat="biglietti" data-day="mer"></td>
+          <td contenteditable="true" data-cat="biglietti" data-day="gio"></td>
+          <td contenteditable="true" data-cat="biglietti" data-day="ven"></td>
+          <td contenteditable="true" data-cat="biglietti" data-day="sab"></td>
+          <td contenteditable="true" data-cat="biglietti" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Carburante c/contante</td>
-          <!-- 7 celle data-cat="carburCont" ... -->
+          <td contenteditable="true" data-cat="carburCont" data-day="lun"></td>
+          <td contenteditable="true" data-cat="carburCont" data-day="mar"></td>
+          <td contenteditable="true" data-cat="carburCont" data-day="mer"></td>
+          <td contenteditable="true" data-cat="carburCont" data-day="gio"></td>
+          <td contenteditable="true" data-cat="carburCont" data-day="ven"></td>
+          <td contenteditable="true" data-cat="carburCont" data-day="sab"></td>
+          <td contenteditable="true" data-cat="carburCont" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Altro (Spese Viaggio)</td>
-          <!-- 7 celle data-cat="viaggioAltro" ... -->
+          <td contenteditable="true" data-cat="viaggioAltro" data-day="lun"></td>
+          <td contenteditable="true" data-cat="viaggioAltro" data-day="mar"></td>
+          <td contenteditable="true" data-cat="viaggioAltro" data-day="mer"></td>
+          <td contenteditable="true" data-cat="viaggioAltro" data-day="gio"></td>
+          <td contenteditable="true" data-cat="viaggioAltro" data-day="ven"></td>
+          <td contenteditable="true" data-cat="viaggioAltro" data-day="sab"></td>
+          <td contenteditable="true" data-cat="viaggioAltro" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr class="sp-viaggio-subtot">
@@ -150,38 +178,78 @@
         <tr>
           <td>Alloggio</td>
           <td contenteditable="true" data-cat="alloggio" data-day="lun"></td>
-          <!-- ... -->
+          <td contenteditable="true" data-cat="alloggio" data-day="mar"></td>
+          <td contenteditable="true" data-cat="alloggio" data-day="mer"></td>
+          <td contenteditable="true" data-cat="alloggio" data-day="gio"></td>
+          <td contenteditable="true" data-cat="alloggio" data-day="ven"></td>
+          <td contenteditable="true" data-cat="alloggio" data-day="sab"></td>
+          <td contenteditable="true" data-cat="alloggio" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Colazione</td>
-          <!-- 7 celle data-cat="colazione" ... -->
+          <td contenteditable="true" data-cat="colazione" data-day="lun"></td>
+          <td contenteditable="true" data-cat="colazione" data-day="mar"></td>
+          <td contenteditable="true" data-cat="colazione" data-day="mer"></td>
+          <td contenteditable="true" data-cat="colazione" data-day="gio"></td>
+          <td contenteditable="true" data-cat="colazione" data-day="ven"></td>
+          <td contenteditable="true" data-cat="colazione" data-day="sab"></td>
+          <td contenteditable="true" data-cat="colazione" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Pranzo</td>
-          <!-- ... -->
+          <td contenteditable="true" data-cat="pranzo" data-day="lun"></td>
+          <td contenteditable="true" data-cat="pranzo" data-day="mar"></td>
+          <td contenteditable="true" data-cat="pranzo" data-day="mer"></td>
+          <td contenteditable="true" data-cat="pranzo" data-day="gio"></td>
+          <td contenteditable="true" data-cat="pranzo" data-day="ven"></td>
+          <td contenteditable="true" data-cat="pranzo" data-day="sab"></td>
+          <td contenteditable="true" data-cat="pranzo" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Cena</td>
-          <!-- ... -->
+          <td contenteditable="true" data-cat="cena" data-day="lun"></td>
+          <td contenteditable="true" data-cat="cena" data-day="mar"></td>
+          <td contenteditable="true" data-cat="cena" data-day="mer"></td>
+          <td contenteditable="true" data-cat="cena" data-day="gio"></td>
+          <td contenteditable="true" data-cat="cena" data-day="ven"></td>
+          <td contenteditable="true" data-cat="cena" data-day="sab"></td>
+          <td contenteditable="true" data-cat="cena" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Acqua/Caffè</td>
-          <!-- ... -->
+          <td contenteditable="true" data-cat="acquaCaffe" data-day="lun"></td>
+          <td contenteditable="true" data-cat="acquaCaffe" data-day="mar"></td>
+          <td contenteditable="true" data-cat="acquaCaffe" data-day="mer"></td>
+          <td contenteditable="true" data-cat="acquaCaffe" data-day="gio"></td>
+          <td contenteditable="true" data-cat="acquaCaffe" data-day="ven"></td>
+          <td contenteditable="true" data-cat="acquaCaffe" data-day="sab"></td>
+          <td contenteditable="true" data-cat="acquaCaffe" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Altro (Alloggio/Pasti)</td>
-          <!-- ... -->
+          <td contenteditable="true" data-cat="alloggioAltro" data-day="lun"></td>
+          <td contenteditable="true" data-cat="alloggioAltro" data-day="mar"></td>
+          <td contenteditable="true" data-cat="alloggioAltro" data-day="mer"></td>
+          <td contenteditable="true" data-cat="alloggioAltro" data-day="gio"></td>
+          <td contenteditable="true" data-cat="alloggioAltro" data-day="ven"></td>
+          <td contenteditable="true" data-cat="alloggioAltro" data-day="sab"></td>
+          <td contenteditable="true" data-cat="alloggioAltro" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr class="alloggio-pasti-subtot">
           <td class="totale-blocco">Subtotale giornaliero Alloggio/Pasti</td>
           <td data-cat="alloggioDay" data-day="lun"></td>
-          <!-- ... -->
+          <td data-cat="alloggioDay" data-day="mar"></td>
+          <td data-cat="alloggioDay" data-day="mer"></td>
+          <td data-cat="alloggioDay" data-day="gio"></td>
+          <td data-cat="alloggioDay" data-day="ven"></td>
+          <td data-cat="alloggioDay" data-day="sab"></td>
+          <td data-cat="alloggioDay" data-day="dom"></td>
           <td class="totale-blocco alloggio-total">0</td>
         </tr>
 
@@ -189,17 +257,27 @@
         <tr>
           <td>Carburante (Carta ENI)</td>
           <td contenteditable="true" data-cat="cartaEni" data-day="lun"></td>
-          <!-- ... -->
+          <td contenteditable="true" data-cat="cartaEni" data-day="mar"></td>
+          <td contenteditable="true" data-cat="cartaEni" data-day="mer"></td>
+          <td contenteditable="true" data-cat="cartaEni" data-day="gio"></td>
+          <td contenteditable="true" data-cat="cartaEni" data-day="ven"></td>
+          <td contenteditable="true" data-cat="cartaEni" data-day="sab"></td>
+          <td contenteditable="true" data-cat="cartaEni" data-day="dom"></td>
           <td class="totale-riga">0</td>
         </tr>
         <tr class="carburante-subtot">
           <td class="totale-blocco">Subtotale giornaliero Carburante ENI</td>
           <td data-cat="carbEniDay" data-day="lun"></td>
-          <!-- ... -->
+          <td data-cat="carbEniDay" data-day="mar"></td>
+          <td data-cat="carbEniDay" data-day="mer"></td>
+          <td data-cat="carbEniDay" data-day="gio"></td>
+          <td data-cat="carbEniDay" data-day="ven"></td>
+          <td data-cat="carbEniDay" data-day="sab"></td>
+          <td data-cat="carbEniDay" data-day="dom"></td>
           <td class="totale-blocco carburante-total">0</td>
         </tr>
-
       </tbody>
+
       <tfoot>
         <tr>
           <td><strong>TOTALE SETTIMANA</strong></td>
@@ -224,7 +302,7 @@
     </div>
   </section>
 
-  <!-- PULSANTI ESPORTA / STAMPA -->
+  <!-- PULSANTI -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
@@ -234,7 +312,7 @@
   <!-- Script principale -->
   <script src="app.js"></script>
 
-  <!-- Registrazione service worker (PWA) -->
+  <!-- Service worker per PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
