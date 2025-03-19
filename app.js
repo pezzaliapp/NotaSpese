@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const tableSpese     = document.getElementById('table-spese');
 
   // Oggetto in cui memorizziamo i valori
-  // Chiavi: "lun","mar","mer","gio","ven","sab","dom"
   let speseData = {
     lun: {},
     mar: {},
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Giorni
   const giorni = ["lun","mar","mer","gio","ven","sab","dom"];
 
-  // Categorie di spese per subtotali
+  // Categorie di spesa
   const speseViaggioCats = ["parcheggi","noleggio","taxiBus","biglietti","carburCont","viaggioAltro"];
   const alloggioCats     = ["alloggio","colazione","pranzo","cena","acquaCaffe","alloggioAltro"];
   const carburanteCats   = ["cartaEni"];
@@ -42,24 +41,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // ========================
   function aggiornaCalcoli() {
     let totaleKmSettimana   = 0;
-    let totaleSpeseSett     = 0;
+    let spViaggioWeekTot    = 0;
+    let alloggioWeekTot     = 0;
+    let carburanteWeekTot   = 0;
 
-    // 1) Km Diff
+    // 1) Calcolo Km Diff
     giorni.forEach(day => {
       const kmIni = parseFloat(speseData[day].kmIni) || 0;
       const kmFin = parseFloat(speseData[day].kmFin) || 0;
       const diff  = kmFin - kmIni;
       speseData[day].kmDiff = diff;
 
-      // Aggiorna la cella data-cat="kmDiff"
+      // Aggiorna cella data-cat="kmDiff"
       const cellDiff = tableSpese.querySelector(`td[data-cat="kmDiff"][data-day="${day}"]`);
-      if (cellDiff) {
-        cellDiff.innerText = diff.toFixed(2);
-      }
+      if (cellDiff) cellDiff.innerText = diff.toFixed(2);
+
       totaleKmSettimana += diff;
     });
 
-    // 2) Subtotali giornalieri (Spese Viaggio, Alloggio/Pasti, Carburante)
+    // 2) Calcolo subtotali giornalieri per Spese Viaggio, Alloggio/Pasti, Carburante
     giorni.forEach(day => {
       let subtotViaggio    = 0;
       let subtotAlloggio   = 0;
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       speseViaggioCats.forEach(cat => {
         subtotViaggio += parseFloat(speseData[day][cat]) || 0;
       });
-      // Alloggio
+      // Alloggio/Pasti
       alloggioCats.forEach(cat => {
         subtotAlloggio += parseFloat(speseData[day][cat]) || 0;
       });
@@ -78,24 +78,29 @@ document.addEventListener('DOMContentLoaded', () => {
         subtotCarburante += parseFloat(speseData[day][cat]) || 0;
       });
 
-      // Aggiorna celle
+      // Aggiorna le celle di subtotale giornaliero
       const cellViaggio   = tableSpese.querySelector(`td[data-cat="spViaggioDay"][data-day="${day}"]`);
-      if (cellViaggio)   cellViaggio.innerText = subtotViaggio.toFixed(2);
+      if (cellViaggio) cellViaggio.innerText = subtotViaggio.toFixed(2);
 
       const cellAlloggio  = tableSpese.querySelector(`td[data-cat="alloggioDay"][data-day="${day}"]`);
-      if (cellAlloggio)  cellAlloggio.innerText = subtotAlloggio.toFixed(2);
+      if (cellAlloggio) cellAlloggio.innerText = subtotAlloggio.toFixed(2);
 
       const cellCarbEni   = tableSpese.querySelector(`td[data-cat="carbEniDay"][data-day="${day}"]`);
-      if (cellCarbEni)   cellCarbEni.innerText = subtotCarburante.toFixed(2);
+      if (cellCarbEni) cellCarbEni.innerText = subtotCarburante.toFixed(2);
 
-      totaleSpeseSett += (subtotViaggio + subtotAlloggio + subtotCarburante);
+      // Accumula i subtotali per la settimana
+      spViaggioWeekTot    += subtotViaggio;
+      alloggioWeekTot     += subtotAlloggio;
+      carburanteWeekTot   += subtotCarburante;
     });
 
-    // 3) Aggiorna la cella "km-sett-tot"
+    // 3) Aggiorna Totale Km Settimana
     const cellKmSet = tableSpese.querySelector(".km-sett-tot");
-    if (cellKmSet) cellKmSet.innerText = totaleKmSettimana.toFixed(2);
+    if (cellKmSet) {
+      cellKmSet.innerText = totaleKmSettimana.toFixed(2);
+    }
 
-    // 4) Per ogni riga, somma le 7 celle contenteditable => scrivi in .totale-riga
+    // 4) Aggiorna la colonna Totale di ogni riga
     const rows = tableSpese.tBodies[0].rows;
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -111,18 +116,36 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // 5) Aggiorna la cella "totale-settimana" con la somma di tutte le spese
-    // (No km). Abbiamo "totaleSpeseSett" calcolato.
+    // 5) Calcolo Totale Spese Viaggio Settimana
+    const spViaggioWeekCell = tableSpese.querySelector(".sp-viaggio-week-tot");
+    if (spViaggioWeekCell) {
+      spViaggioWeekCell.innerText = spViaggioWeekTot.toFixed(2);
+    }
+
+    // 6) Calcolo Totale Alloggio/Pasti Settimana
+    const alloggioWeekCell = tableSpese.querySelector(".alloggio-week-tot");
+    if (alloggioWeekCell) {
+      alloggioWeekCell.innerText = alloggioWeekTot.toFixed(2);
+    }
+
+    // 7) Calcolo Totale Carburante ENI Settimana
+    const carbEniWeekCell = tableSpese.querySelector(".carburante-week-tot");
+    if (carbEniWeekCell) {
+      carbEniWeekCell.innerText = carburanteWeekTot.toFixed(2);
+    }
+
+    // 8) TOTALE SETTIMANA (somma dei 3 blocchi)
+    const totalSett = spViaggioWeekTot + alloggioWeekTot + carburanteWeekTot;
     const cellTotSettimana = tableSpese.querySelector(".totale-settimana");
     if (cellTotSettimana) {
-      cellTotSettimana.innerText = totaleSpeseSett.toFixed(2);
+      cellTotSettimana.innerText = totalSett.toFixed(2);
     }
   }
 
   // ========================
   //  Eventi su celle
   // ========================
-  // Quando modifichi una cella, salvi in speseData e ricalcoli
+  // Ogni cella editabile => aggiorna speseData e richiama aggiornaCalcoli
   const editableCells = tableSpese.querySelectorAll('td[contenteditable="true"]');
   editableCells.forEach(cell => {
     cell.addEventListener('input', () => {
@@ -151,12 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const dati = JSON.parse(salvato);
-    dipInput.value       = dati.dipendente      || "";
-    targaInput.value     = dati.targa           || "";
-    noteInput.value      = dati.note            || "";
-    firmaDirInput.value  = dati.firmaDirezione  || "";
-    firmaDipInput.value  = dati.firmaDipendente || "";
-    speseData            = dati.speseData       || {};
+    dipInput.value    = dati.dipendente      || "";
+    targaInput.value  = dati.targa           || "";
+    noteInput.value   = dati.note            || "";
+    firmaDirInput.value = dati.firmaDirezione  || "";
+    firmaDipInput.value = dati.firmaDipendente || "";
+    speseData         = dati.speseData       || {};
 
     // Ripristina i valori nelle celle
     for (let day of giorni) {
@@ -222,6 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.print();
   });
 
-  // All'avvio, calcola subito
+  // All'avvio
   aggiornaCalcoli();
 });
