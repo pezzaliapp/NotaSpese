@@ -1,262 +1,146 @@
 document.addEventListener('DOMContentLoaded', () => {
   //
-  // 1. Mappa sottocategorie
+  // 1. Selettori
   //
-  const sottoCatMap = {
-    km: ['Km Iniziali','Km Finali'],
-    'spese-viaggio': [
-      'Parcheggi','Noleggio Auto','Taxi / Autobus','Biglietti Aerei/Treni','Carburante c/contante','Altro'
-    ],
-    'alloggio-pasti': [
-      'Alloggio','Colazione','Pranzo','Cena','Acqua/Caffè','Altro'
-    ],
-    carburante: ['Carta ENI']
-  };
-
-  //
-  // 2. Struttura dati
-  //
-  // Ogni voce: { data, giorno, settimanaAuto, descrizione, categoria, sottocategoria, valore, allegatoBase64 }
-  let vociCorrenti = [];
-  let editIndex = -1;
-
-  //
-  // 3. Selettori
-  //
-  // Dati generali
   const dipInput       = document.getElementById('dipendente');
   const targaInput     = document.getElementById('targa');
-  const nSettInput     = document.getElementById('numero-settimana');
+  const settInput      = document.getElementById('numero-settimana');
   const caricaBtn      = document.getElementById('carica-settimana');
   const salvaBtn       = document.getElementById('salva-settimana');
 
-  // Inserimento voce
-  const dataInput      = document.getElementById('data-giorno');
-  const giornoInput    = document.getElementById('giorno-settimana');
-  const settAutoInput  = document.getElementById('settimana-auto');
-  const descInput      = document.getElementById('descrizione-giorno');
-  const catSelect      = document.getElementById('categoria');
-  const sottoCatSelect = document.getElementById('sottocategoria');
-  const valoreInput    = document.getElementById('valore-voce');
-  const allegatoInput  = document.getElementById('allegato');
-  const aggiungiBtn    = document.getElementById('aggiungi-voce');
-
-  // Riepilogo (verticale)
-  const riepilogoContainer = document.getElementById('riepilogo-container');
-  const sommaSettEl        = document.getElementById('somma-settimanale');
-
-  // Note/firme
+  const tableExcel     = document.getElementById('table-excel');
   const noteArea       = document.getElementById('note');
   const firmaDirInput  = document.getElementById('firma-direzione');
   const firmaDipInput  = document.getElementById('firma-dipendente');
 
-  // Pulsanti
   const stampaTxtBtn   = document.getElementById('stampa-txt');
   const wappBtn        = document.getElementById('condividi-whatsapp');
   const stampaRepBtn   = document.getElementById('stampa-replica');
 
-  //
-  // 4. Cambio data => calcola giorno e settimana
-  //
-  dataInput.addEventListener('change', () => {
-    if (!dataInput.value) return;
-    const [yyyy, mm, dd] = dataInput.value.split('-');
-    const d = new Date(+yyyy, +mm-1, +dd);
-    const giorniITA = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
-    giornoInput.value = giorniITA[d.getDay()];
-    settAutoInput.value = getISOWeekNumber(d);
-  });
+  // Celle editabili => mappa: data-cat + data-day => valore
+  // Salveremo questi dati in un oggetto come { lun: {...}, mar: {...}, mer: {...} ... }
+  // E per le categorie: kmIni, kmFin, parcheggi, alloggio, ...
+  // Poi calcoliamo differenze e totali.
 
-  function getISOWeekNumber(d) {
-    const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    let day = tmp.getUTCDay();
-    if (day===0) day=7;
-    tmp.setUTCDate(tmp.getUTCDate()+4-day);
-    const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
-    return Math.ceil(((tmp-yearStart)/86400000+1)/7);
-  }
+  // Memoria in JS:
+  let speseData = {
+    // es. "lun": { kmIni: 0, kmFin: 0, parcheggi: 0, ... },
+    // "mar": { kmIni: ..., ...}, ...
+  };
 
-  //
-  // 5. Cambio categoria => popola sottocategorie
-  //
-  catSelect.addEventListener('change', () => {
-    sottoCatSelect.innerHTML = '<option value="">-- Sottocategoria --</option>';
-    const c = catSelect.value;
-    if (sottoCatMap[c]) {
-      sottoCatMap[c].forEach(sub => {
-        const op = document.createElement('option');
-        op.value=sub; op.textContent=sub;
-        sottoCatSelect.appendChild(op);
-      });
-    }
-  });
+  // Al caricamento, inizializziamo con 0 tutte le celle
+  initSpeseData();
 
-  //
-  // 6. Aggiungi/Modifica
-  //
-  aggiungiBtn.addEventListener('click', async () => {
-    if (!dataInput.value) { alert('Inserisci una data'); return; }
-    if (!catSelect.value || !sottoCatSelect.value) {
-      alert('Seleziona Categoria e Sottocategoria');
-      return;
-    }
-
-    // Converti il file allegato in base64 (opzionale: potresti usarlo come File object e NON salvare su localStorage)
-    let base64str = null;
-    if (allegatoInput.files && allegatoInput.files[0]) {
-      const file = allegatoInput.files[0];
-      base64str = await fileToBase64(file);
-    }
-
-    const voce = {
-      data: dataInput.value,
-      giorno: giornoInput.value,
-      settimanaAuto: settAutoInput.value,
-      descrizione: descInput.value.trim(),
-      categoria: catSelect.value,
-      sottocategoria: sottoCatSelect.value,
-      valore: parseFloat(valoreInput.value) || 0,
-      allegatoBase64: base64str // null se nessun allegato
-    };
-
-    if (editIndex >= 0) {
-      vociCorrenti[editIndex] = voce;
-      editIndex = -1;
-      aggiungiBtn.textContent='Aggiungi';
-    } else {
-      vociCorrenti.push(voce);
-    }
-
-    // Pulizia minima (non resettiamo data/cat se vuoi rimanere sulla stessa)
-    descInput.value='';
-    valoreInput.value='';
-    allegatoInput.value='';
-
-    aggiornaRiepilogo();
-  });
-
-  // Helper per convertire file -> base64
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = e => resolve(e.target.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file); // risulta in base64
+  function initSpeseData() {
+    ["lun","mar","mer","gio","ven","sab","dom"].forEach(g => {
+      speseData[g] = {
+        kmIni: 0,
+        kmFin: 0,
+        // spese-viaggio:
+        parcheggi: 0,
+        // ... e così via per ogni riga definita
+        alloggio: 0,
+        // Carburante, etc.
+        carburanteENI: 0
+      };
     });
   }
 
-  //
-  // 7. Aggiorna Riepilogo in verticale
-  //
-  function aggiornaRiepilogo() {
-    riepilogoContainer.innerHTML = '';
-
-    vociCorrenti.forEach((voce, i) => {
-      const card = document.createElement('div');
-      card.classList.add('voce-card');
-
-      const h3 = document.createElement('h3');
-      h3.textContent = `Data: ${voce.data} - Settimana: ${voce.settimanaAuto}`;
-      card.appendChild(h3);
-
-      // Mostriamo gli altri campi in verticale
-      const p1 = document.createElement('p');
-      p1.textContent = `Giorno: ${voce.giorno}`;
-      card.appendChild(p1);
-
-      const p2 = document.createElement('p');
-      p2.textContent = `Descrizione: ${voce.descrizione}`;
-      card.appendChild(p2);
-
-      const p3 = document.createElement('p');
-      p3.textContent = `Categoria: ${voce.categoria} / ${voce.sottocategoria}`;
-      card.appendChild(p3);
-
-      // Calcolo diff km (0 se Km Iniz, se Km Finali cerchiamo “Km Iniziali”)
-      let diff = 0;
-      if (voce.categoria==='km' && voce.sottocategoria==='Km Finali') {
-        const ini = vociCorrenti.find(x => 
-          x.data===voce.data && x.categoria==='km' && x.sottocategoria==='Km Iniziali'
-        );
-        if (ini) {
-          diff = voce.valore - ini.valore;
-        }
+  // 2. Lega eventi su contenteditable => oninput => aggiorna speseData e ricalcola
+  const cells = tableExcel.querySelectorAll('td[contenteditable="true"]');
+  cells.forEach(cell => {
+    cell.addEventListener('input', () => {
+      const cat = cell.dataset.cat;  // es. "kmIni", "parcheggi", ...
+      const day = cell.dataset.day;  // es. "lun", "mar", ...
+      const val = parseFloat(cell.innerText.replace(',','.')) || 0;
+      if (speseData[day]) {
+        speseData[day][cat] = val;
       }
-      const p4 = document.createElement('p');
-      p4.textContent = `Valore: ${voce.valore} | Diff Km: ${diff}`;
-      card.appendChild(p4);
+      aggiornaCalcoli();
+    });
+  });
 
-      // Anteprima allegato se presente
-      if (voce.allegatoBase64) {
-        const img = document.createElement('img');
-        img.classList.add('foto-preview');
-        img.src = voce.allegatoBase64;
-        card.appendChild(img);
+  // 3. Funzione aggiornaCalcoli => calcola diff Km, tot riga, tot blocco, tot settimana
+  function aggiornaCalcoli() {
+    // a) Per ogni riga "Km Giornalieri" => kmFin - kmIni su base day
+    // Troviamo le celle data-cat="kmDiff"
+    ["lun","mar","mer","gio","ven","sab","dom"].forEach(day => {
+      const ini = speseData[day].kmIni || 0;
+      const fin = speseData[day].kmFin || 0;
+      const diff = fin - ini;
+      // Troviamo la cella "data-cat=kmDiff" e data-day=day
+      const cellDiff = tableExcel.querySelector(`td[data-cat="kmDiff"][data-day="${day}"]`);
+      if (cellDiff) {
+        cellDiff.innerText = diff;
       }
-
-      // Sezione Azioni
-      const azioniDiv = document.createElement('div');
-      azioniDiv.classList.add('azioni');
-
-      const btnMod = document.createElement('button');
-      btnMod.textContent='Modifica';
-      btnMod.addEventListener('click', () => {
-        // Carichiamo i campi
-        editIndex = i;
-        dataInput.value=voce.data;
-        giornoInput.value=voce.giorno;
-        settAutoInput.value=voce.settimanaAuto;
-        descInput.value=voce.descrizione;
-        catSelect.value=voce.categoria;
-        sottoCatSelect.innerHTML='<option value="">-- Sottocategoria --</option>';
-        if (sottoCatMap[voce.categoria]) {
-          sottoCatMap[voce.categoria].forEach(sub => {
-            const op = document.createElement('option');
-            op.value=sub; op.textContent=sub;
-            sottoCatSelect.appendChild(op);
-          });
-        }
-        sottoCatSelect.value = voce.sottocategoria;
-        valoreInput.value = voce.valore;
-        // allegato: non possiamo reimpostare un file su un input, 
-        // ma se vuoi mostrare l'anteprima la hai in voce.allegatoBase64
-        allegatoInput.value='';
-        aggiungiBtn.textContent='Salva Modifica';
-      });
-      azioniDiv.appendChild(btnMod);
-
-      const btnDel = document.createElement('button');
-      btnDel.textContent='Elimina';
-      btnDel.addEventListener('click', () => {
-        vociCorrenti.splice(i,1);
-        aggiornaRiepilogo();
-      });
-      azioniDiv.appendChild(btnDel);
-
-      card.appendChild(azioniDiv);
-
-      riepilogoContainer.appendChild(card);
     });
 
-    // Calcolo Totale Spese
-    let totSpese=0;
-    vociCorrenti.forEach(v => {
-      if (v.categoria!=='km') {
-        totSpese += v.valore;
+    // b) Totale di riga => somma di Lunedì..Domenica
+    // Esempio, la riga "Km Iniziali" => data-cat="kmIni"
+    // prendiamo la riga .km-iniziali => .totale-riga
+    const allRows = tableExcel.querySelectorAll('tbody tr');
+    allRows.forEach(row => {
+      const catCells = row.querySelectorAll('td[contenteditable="true"]');
+      let somma = 0;
+      catCells.forEach(c => {
+        const val = parseFloat(c.innerText.replace(',','.'))||0;
+        somma += val;
+      });
+      const totCell = row.querySelector('.totale-riga');
+      if (totCell) {
+        totCell.innerText = somma.toFixed(2);
       }
     });
-    sommaSettEl.textContent=totSpese.toFixed(2);
+
+    // c) Totale blocco (es. la riga ".tot-km" => .totale-blocco-km)
+    // cerchiamo differenza tot riga di "Km Giornalieri", la sommiamo
+    const kmDiffCells = tableExcel.querySelectorAll('td[data-cat="kmDiff"]');
+    let sommaKmSett = 0;
+    kmDiffCells.forEach(cd => {
+      const val = parseFloat(cd.innerText.replace(',','.'))||0;
+      sommaKmSett += val;
+    });
+    const totKmCell = tableExcel.querySelector('.totale-blocco-km');
+    if (totKmCell) totKmCell.innerText = sommaKmSett.toFixed(2);
+
+    // d) Totale Spese Viaggio (somma righe: parcheggi, taxi, bus, etc.)
+    // e) Totale Alloggio e Pasti
+    // f) Totale Carburante
+    // Per esempio, la ".spese-viaggio-total" => .totale-blocco-viaggio
+    // puoi personalizzare la logica per ciascun blocco.
+    let sommaViaggio = 0;
+    // un array di cat che fanno parte di spese-viaggio
+    // oppure prendi la riga .spese-parcheggi etc. e somma .totale-riga
+    const righeViaggio = tableExcel.querySelectorAll('.spese-parcheggi, .spese-noleggio, ...');
+    righeViaggio.forEach(r => {
+      const tot = r.querySelector('.totale-riga');
+      if (tot) {
+        const v = parseFloat(tot.innerText)||0;
+        sommaViaggio += v;
+      }
+    });
+    const totViaggioCell = tableExcel.querySelector('.totale-blocco-viaggio');
+    if (totViaggioCell) totViaggioCell.innerText = sommaViaggio.toFixed(2);
+
+    // ... e così via per Alloggio e Pasti, Carburante, ...
+    let sommaAlloggio = 0; 
+    // raccogli le righe e somma .totale-riga => .totale-blocco-alloggio
+    // ...
+    // g) TOTALE SETTIMANA (somme di tutti i blocchi spese, non i km)
+    // Esempio:
+    let totSettimana = sommaViaggio + /* + alloggio + carburante + ...*/ 0;
+    // Se hai righe .alloggio-pasti-total e .carburante-total con i totali di blocco
+    // potresti semplicemente sommarli.
+    const cellTotSettimana = tableExcel.querySelector('.totale-settimana');
+    if (cellTotSettimana) cellTotSettimana.innerText = totSettimana.toFixed(2);
   }
 
-  //
-  // 8. Carica/Salva Settimana
-  //
+  aggiornaCalcoli(); // Per inizializzare
+
+  // 4. Carica/Salva
   caricaBtn.addEventListener('click', () => {
-    const nSett = nSettInput.value;
-    if (!nSett) {
-      alert('Inserisci il numero settimana da caricare');
-      return;
-    }
+    const nSett = settInput.value;
+    if (!nSett) { alert('N. settimana mancante'); return; }
     const key = `NotaSpese_${nSett}`;
     const salvato = localStorage.getItem(key);
     if (!salvato) {
@@ -264,24 +148,21 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const obj = JSON.parse(salvato);
-    dipInput.value   = obj.dipendente || '';
-    targaInput.value = obj.targa || '';
-    noteArea.value   = obj.note || '';
-    firmaDirInput.value = obj.firmaDirezione || '';
-    firmaDipInput.value = obj.firmaDipendente || '';
-    vociCorrenti = obj.voci || [];
-    editIndex = -1;
-    aggiungiBtn.textContent='Aggiungi';
-    aggiornaRiepilogo();
+    dipInput.value    = obj.dipendente||'';
+    targaInput.value  = obj.targa||'';
+    noteArea.value    = obj.note||'';
+    firmaDirInput.value= obj.firmaDirezione||'';
+    firmaDipInput.value= obj.firmaDipendente||'';
+    speseData         = obj.speseData||{};
+    // Aggiorna le celle
+    ripristinaCelle();
+    aggiornaCalcoli();
     alert(`Settimana ${nSett} caricata con successo!`);
   });
 
   salvaBtn.addEventListener('click', () => {
-    const nSett = nSettInput.value;
-    if (!nSett) {
-      alert('Inserisci il numero di settimana da salvare');
-      return;
-    }
+    const nSett = settInput.value;
+    if (!nSett) { alert('N. settimana mancante'); return; }
     const key = `NotaSpese_${nSett}`;
     const obj = {
       dipendente: dipInput.value.trim(),
@@ -289,71 +170,68 @@ document.addEventListener('DOMContentLoaded', () => {
       note: noteArea.value.trim(),
       firmaDirezione: firmaDirInput.value.trim(),
       firmaDipendente: firmaDipInput.value.trim(),
-      voci: vociCorrenti
+      speseData: speseData
     };
-    // Attenzione: se vociCorrenti contiene molte foto base64, potresti saturare localStorage
     localStorage.setItem(key, JSON.stringify(obj));
     alert(`Settimana ${nSett} salvata correttamente!`);
   });
 
-  //
-  // 9. Stampa, WhatsApp, ecc.
-  //
-  stampaTxtBtn.addEventListener('click', () => {
-    const nSett = nSettInput.value || '';
-    let testo = `NOTA SPESE (Settimana ${nSett})\n`;
-    testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
-    vociCorrenti.forEach(v => {
-      testo += `[${v.data} ${v.giorno}] S${v.settimanaAuto} - ${v.descrizione}\n`;
-      testo += `=> ${v.categoria}/${v.sottocategoria} = ${v.valore}`;
-      if (v.categoria==='km' && v.sottocategoria==='Km Finali') {
-        const ini = vociCorrenti.find(x =>
-          x.data===v.data && x.categoria==='km' && x.sottocategoria==='Km Iniziali'
-        );
-        if (ini) {
-          const diff = v.valore - ini.valore;
-          testo += ` (DiffKm: ${diff})`;
+  function ripristinaCelle() {
+    // speseData => { lun: { kmIni:..., kmFin:..., parcheggi:..., ...}, mar: {...}, ... }
+    // Svuotiamo tutte le celle (contenteditable) e poi reimpostiamo
+    const cells = tableExcel.querySelectorAll('td[contenteditable="true"]');
+    cells.forEach(cell => {
+      cell.innerText = '';
+    });
+    // Ora riempiamo
+    ["lun","mar","mer","gio","ven","sab","dom"].forEach(g => {
+      if (!speseData[g]) return; 
+      for (const cat in speseData[g]) {
+        const sel = `td[contenteditable="true"][data-cat="${cat}"][data-day="${g}"]`;
+        const cella = tableExcel.querySelector(sel);
+        if (cella) {
+          cella.innerText = speseData[g][cat] || 0;
         }
       }
-      testo += `\n\n`;
     });
-    let tot=0;
-    vociCorrenti.forEach(x=> { if(x.categoria!=='km') tot+=x.valore; });
-    testo += `Totale Spese (no Km): ${tot.toFixed(2)}\n`;
+  }
+
+  // 5. Stampa in TXT
+  stampaTxtBtn.addEventListener('click', () => {
+    const nSett = settInput.value||'';
+    let testo = `NOTA SPESE TRASFERTA - Settimana ${nSett}\n\n`;
+    testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
+    // Potresti generare un testo che riflette le celle
+    // Esempio: per each day => stampi i valori
+    // ...
     testo += `Note: ${noteArea.value}\n`;
     testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
 
-    const blob = new Blob([testo], { type:'text/plain' });
+    const blob = new Blob([testo],{type:'text/plain'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href=url; a.download=`nota_spese_sett_${nSett}.txt`;
+    a.href=url; a.download=`nota_spese_${nSett}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   });
 
+  // 6. WhatsApp
   wappBtn.addEventListener('click', () => {
-    let testo = `NOTA SPESE\n`;
-    testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
-    vociCorrenti.forEach(v => {
-      testo += `[${v.data}] S${v.settimanaAuto} - ${v.giorno}\n`;
-      testo += `${v.descrizione}\n=> ${v.categoria}/${v.sottocategoria} = ${v.valore}\n\n`;
-    });
-    let tot=0;
-    vociCorrenti.forEach(x=> { if(x.categoria!=='km') tot+=x.valore; });
-    testo += `Totale Spese (no Km): ${tot.toFixed(2)}\n\n`;
-    testo += `Note: ${noteArea.value}\n`;
-    testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
-
-    const wurl = `whatsapp://send?text=${encodeURIComponent(testo)}`;
-    window.open(wurl,'_blank');
+    let testo = `NOTA SPESE\nDipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
+    // ... potresti elencare i valori principali
+    const url = `whatsapp://send?text=${encodeURIComponent(testo)}`;
+    window.open(url,'_blank');
   });
 
+  // 7. Stampa Form
   stampaRepBtn.addEventListener('click', () => {
     window.print();
   });
 
-  //
-  // 10. Avvio
-  //
-  aggiornaRiepilogo();
+  // 8. Se vuoi registrare un service worker per la PWA:
+  /*
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+  */
 });
