@@ -4,81 +4,17 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f0f0f0;
-    }
-    header {
-      background: #1976d2;
-      color: #fff;
-      text-align: center;
-      padding: 1rem;
-    }
-    section {
-      background: #fff;
-      margin: 1rem auto;
-      padding: 1rem;
-      max-width: 1200px;
-      border-radius: 6px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
-    }
-    .riga-dati {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-    label {
-      font-weight: bold;
-      min-width: max-content;
-    }
-    input[type="text"], input[type="number"], textarea {
-      padding: 0.3rem 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    #table-spese {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    #table-spese th, #table-spese td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: center;
-    }
-    #table-spese thead {
-      background: #eaeaea;
-    }
-    #table-spese .totale-riga {
-      font-weight: bold;
-      background: #f7f7f7;
-    }
-    #table-spese .totale-blocco {
-      font-weight: bold;
-      background: #f9f9f9;
-    }
-    #table-spese tfoot tr {
-      font-weight: bold;
-      background: #f5f5f5;
-    }
-    button {
-      padding: 0.4rem 0.8rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #esporta-stampa {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      justify-content: center;
-    }
-  </style>
+
+  <!-- Collegamento al foglio di stile -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Manifest per la PWA -->
+  <link rel="manifest" href="manifest.json" />
+
 </head>
 <body>
+
+  <!-- HEADER -->
   <header>
     <h1>Nota Spese Trasferta</h1>
   </header>
@@ -102,7 +38,7 @@
     </div>
   </section>
 
-  <!-- TABELLA STILE EXCEL -->
+  <!-- TABELLA PRINCIPALE STILE EXCEL -->
   <section>
     <table id="table-spese">
       <thead>
@@ -119,6 +55,7 @@
         </tr>
       </thead>
       <tbody>
+
         <!-- KM -->
         <tr class="km-iniziali">
           <td>Km Iniziali</td>
@@ -169,33 +106,33 @@
           <td contenteditable="true" data-cat="parcheggi" data-day="ven"></td>
           <td contenteditable="true" data-cat="parcheggi" data-day="sab"></td>
           <td contenteditable="true" data-cat="parcheggi" data-day="dom"></td>
-          <td class="totale-riga sp-viaggio-tot-parcheggi">0</td>
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Noleggio Auto</td>
           <td contenteditable="true" data-cat="noleggio" data-day="lun"></td>
-          <!-- e così via ... -->
-          <td class="totale-riga sp-viaggio-tot-noleggio">0</td>
+          <!-- ... le altre 6 celle ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Taxi / Autobus</td>
-          <!-- 7 celle data-cat="taxiBus" data-day="lun" ... -->
-          <td class="totale-riga sp-viaggio-tot-taxibus">0</td>
+          <!-- 7 celle contenteditable data-cat="taxiBus" data-day=... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Biglietti Aerei/Treni</td>
-          <!-- ... -->
-          <td class="totale-riga sp-viaggio-tot-biglietti">0</td>
+          <!-- 7 celle data-cat="biglietti" ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Carburante c/contante</td>
-          <!-- ... -->
-          <td class="totale-riga sp-viaggio-tot-cbcont">0</td>
+          <!-- 7 celle data-cat="carburCont" ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Altro (Spese Viaggio)</td>
-          <!-- ... -->
-          <td class="totale-riga sp-viaggio-tot-altro">0</td>
+          <!-- 7 celle data-cat="viaggioAltro" ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr class="sp-viaggio-subtot">
           <td class="totale-blocco">Subtotale giornaliero Spese Viaggio</td>
@@ -212,48 +149,56 @@
         <!-- ALLOGGIO E PASTI -->
         <tr>
           <td>Alloggio</td>
-          <!-- 7 celle contenteditable data-cat="alloggio" data-day="lun"... -->
-          <td class="totale-riga alloggio-tot"></td>
+          <td contenteditable="true" data-cat="alloggio" data-day="lun"></td>
+          <!-- ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Colazione</td>
-          <!-- ... -->
+          <!-- 7 celle data-cat="colazione" ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Pranzo</td>
           <!-- ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Cena</td>
           <!-- ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Acqua/Caffè</td>
           <!-- ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr>
           <td>Altro (Alloggio/Pasti)</td>
           <!-- ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr class="alloggio-pasti-subtot">
           <td class="totale-blocco">Subtotale giornaliero Alloggio/Pasti</td>
           <td data-cat="alloggioDay" data-day="lun"></td>
           <!-- ... -->
-          <td class="totale-blocco alloggio-total"></td>
+          <td class="totale-blocco alloggio-total">0</td>
         </tr>
 
-        <!-- CARBURANTE c/card ENI -->
+        <!-- CARBURANTE (Carta ENI) -->
         <tr>
           <td>Carburante (Carta ENI)</td>
-          <!-- 7 celle data-cat="carburanteENI" data-day="lun"... -->
-          <td class="totale-riga carburante-eni-tot"></td>
+          <td contenteditable="true" data-cat="cartaEni" data-day="lun"></td>
+          <!-- ... -->
+          <td class="totale-riga">0</td>
         </tr>
         <tr class="carburante-subtot">
           <td class="totale-blocco">Subtotale giornaliero Carburante ENI</td>
           <td data-cat="carbEniDay" data-day="lun"></td>
           <!-- ... -->
-          <td class="totale-blocco carburante-total"></td>
+          <td class="totale-blocco carburante-total">0</td>
         </tr>
+
       </tbody>
       <tfoot>
         <tr>
@@ -279,12 +224,21 @@
     </div>
   </section>
 
+  <!-- PULSANTI ESPORTA / STAMPA -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
     <button id="stampa-replica">Stampa Replica Form</button>
   </section>
 
+  <!-- Script principale -->
   <script src="app.js"></script>
+
+  <!-- Registrazione service worker (PWA) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>
