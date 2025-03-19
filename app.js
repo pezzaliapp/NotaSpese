@@ -2,23 +2,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // SELETTORI GENERALI
   const dipInput       = document.getElementById('dipendente');
   const targaInput     = document.getElementById('targa');
-  // Il campo num-settimana deve essere nel formato "ww/yyyy", es. "11/2025"
+  // Il campo "num-settimana" deve avere il formato "ww/yyyy", ad es. "11/2025"
   const settimanaInput = document.getElementById('num-settimana');
-
+  
   const caricaBtn      = document.getElementById('carica-settimana');
   const salvaBtn       = document.getElementById('salva-settimana');
-
+  
   const noteInput      = document.getElementById('note');
   const firmaDirInput  = document.getElementById('firma-direzione');
   const firmaDipInput  = document.getElementById('firma-dipendente');
-
+  
   const stampaTxtBtn   = document.getElementById('stampa-txt');
   const whatsappBtn    = document.getElementById('condividi-whatsapp');
   const stampaRepBtn   = document.getElementById('stampa-replica');
-
+  
   const tableSpese     = document.getElementById('table-spese');
-
-  // speseData: oggetto che memorizza i valori per ogni giorno
+  
+  // Oggetto che memorizza i valori per ogni giorno (chiavi: lun, mar, mer, gio, ven, sab, dom)
   let speseData = {
     lun: {},
     mar: {},
@@ -28,10 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     sab: {},
     dom: {}
   };
-
-  // Array dei giorni (abbreviazioni)
-  const giorni = ["lun","mar","mer","gio","ven","sab","dom"];
-  // Mappa per i nomi completi dei giorni
+  
+  // Array dei giorni e mappa dei nomi completi
+  const giorni = ["lun", "mar", "mer", "gio", "ven", "sab", "dom"];
   const giorniNomi = {
     lun: "Lunedì",
     mar: "Martedì",
@@ -41,16 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
     sab: "Sabato",
     dom: "Domenica"
   };
-
-  // Array di categorie per i subtotali
+  
+  // Categorie di spesa per i subtotali
   const speseViaggioCats = ["parcheggi", "noleggio", "taxiBus", "biglietti", "carburCont", "viaggioAltro"];
   const alloggioCats     = ["alloggio", "colazione", "pranzo", "cena", "acquaCaffe", "alloggioAltro"];
   const carburanteCats   = ["cartaEni"];
-
-  // ===============================
-  // Funzione: Aggiorna l'intestazione in base al numero settimana
-  // ===============================
+  
+  // ===============================================
+  // Funzione: Aggiorna l'intestazione della tabella
+  // ===============================================
   function updateHeaderDates() {
+    // Il campo settimanaInput deve essere nel formato "ww/yyyy"
     const val = settimanaInput.value.trim();
     if (!val.includes("/")) return;
     const parts = val.split("/");
@@ -58,52 +58,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const week = parseInt(parts[0], 10);
     const year = parseInt(parts[1], 10);
     if (isNaN(week) || isNaN(year)) return;
-
+  
     // Calcola il lunedì della settimana ISO
     const monday = getMondayOfISOWeek(week, year);
     const headerRow = tableSpese.tHead.rows[0];
-    // Aggiorna le intestazioni delle colonne da 2 a 8 (indice 1..7)
+    // Aggiorna le intestazioni (colonne 2-8, indice 1..7)
     for (let i = 1; i <= 7; i++) {
-      const dateObj = new Date(monday);
-      dateObj.setDate(monday.getDate() + i - 1);
-      headerRow.cells[i].innerText = giorniNomi[giorni[i - 1]] + " (" + formatDate(dateObj) + ")";
+      const dayIndex = i - 1;
+      let dateObj = new Date(monday);
+      dateObj.setDate(monday.getDate() + dayIndex);
+      headerRow.cells[i].innerText = giorniNomi[giorni[dayIndex]] + " (" + formatDate(dateObj) + ")";
     }
   }
-
-  // Calcola il lunedì della settimana ISO dato il numero settimana e l'anno
+  
+  // Calcola il lunedì della settimana ISO data week e year
   function getMondayOfISOWeek(week, year) {
+    // Trova il primo lunedì dell'anno ISO
     const simple = new Date(year, 0, 1);
-    const dayOfWeek = simple.getDay();
-    // Se il 1° gennaio non è lunedì, trova il primo lunedì
-    const diff = dayOfWeek === 1 ? 0 : (dayOfWeek === 0 ? 1 : (8 - dayOfWeek));
+    const dayOfWeek = simple.getDay(); // 0 = domenica
+    // Se il 1° gennaio non è lunedì, calcola il primo lunedì
+    const diff = dayOfWeek === 0 ? 1 : (dayOfWeek === 1 ? 0 : (8 - dayOfWeek));
     const firstMonday = new Date(year, 0, 1 + diff);
     const monday = new Date(firstMonday);
     monday.setDate(firstMonday.getDate() + (week - 1) * 7);
     return monday;
   }
-
-  // Formatta la data in dd/mm/yyyy
+  
+  // Format data in dd/mm/yyyy
   function formatDate(dateObj) {
     const dd = String(dateObj.getDate()).padStart(2, '0');
     const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
     const yyyy = dateObj.getFullYear();
     return dd + "/" + mm + "/" + yyyy;
   }
-
-  // Aggiorna l'intestazione quando il campo settimana cambia
+  
   settimanaInput.addEventListener('change', updateHeaderDates);
-
-  // ===============================
-  // Funzione: Aggiorna Calcoli e Subtotali
-  // ===============================
+  
+  // ===============================================
+  // Funzione: Aggiorna i calcoli e i subtotali
+  // ===============================================
   function aggiornaCalcoli() {
     let totaleKmSettimana = 0;
     let spViaggioWeekTot = 0;
     let alloggioWeekTot = 0;
     let carburanteWeekTot = 0;
     let totaleSpeseSett = 0;
-
-    // 1) Calcolo Km Diff per ogni giorno
+  
+    // 1) Calcola i km giornalieri per ogni giorno
     giorni.forEach(day => {
       const kmIni = parseFloat(speseData[day].kmIni) || 0;
       const kmFin = parseFloat(speseData[day].kmFin) || 0;
@@ -111,17 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
       speseData[day].kmDiff = diff;
       totaleKmSettimana += diff;
       const cellDiff = tableSpese.querySelector(`td[data-cat="kmDiff"][data-day="${day}"]`);
-      if (cellDiff) {
-        cellDiff.innerText = diff.toFixed(2);
-      }
+      if (cellDiff) cellDiff.innerText = diff.toFixed(2);
     });
-
-    // 2) Calcolo subtotali giornalieri per i blocchi
+  
+    // 2) Calcola i subtotali giornalieri per i blocchi
     giorni.forEach(day => {
       let subtotViaggio = 0;
       let subtotAlloggio = 0;
       let subtotCarburante = 0;
-
+  
       speseViaggioCats.forEach(cat => {
         subtotViaggio += parseFloat(speseData[day][cat]) || 0;
       });
@@ -131,31 +130,32 @@ document.addEventListener('DOMContentLoaded', () => {
       carburanteCats.forEach(cat => {
         subtotCarburante += parseFloat(speseData[day][cat]) || 0;
       });
-
+  
       speseData[day].spViaggioDay = subtotViaggio;
       speseData[day].alloggioDay = subtotAlloggio;
       speseData[day].carbEniDay = subtotCarburante;
-
+  
       spViaggioWeekTot += subtotViaggio;
       alloggioWeekTot += subtotAlloggio;
       carburanteWeekTot += subtotCarburante;
-
+  
+      // Aggiorna le celle dei subtotali giornalieri
       const cellViaggio = tableSpese.querySelector(`td[data-cat="spViaggioDay"][data-day="${day}"]`);
       if (cellViaggio) cellViaggio.innerText = subtotViaggio.toFixed(2);
+  
       const cellAlloggio = tableSpese.querySelector(`td[data-cat="alloggioDay"][data-day="${day}"]`);
       if (cellAlloggio) cellAlloggio.innerText = subtotAlloggio.toFixed(2);
+  
       const cellCarbEni = tableSpese.querySelector(`td[data-cat="carbEniDay"][data-day="${day}"]`);
       if (cellCarbEni) cellCarbEni.innerText = subtotCarburante.toFixed(2);
-
+  
       totaleSpeseSett += subtotViaggio + subtotAlloggio + subtotCarburante;
     });
-
-    // 3) Aggiorna Totale Km Settimana
+  
+    // 3) Aggiorna la cella "Totale Km Settimana"
     const cellKmSet = tableSpese.querySelector(".km-sett-tot");
-    if (cellKmSet) {
-      cellKmSet.innerText = totaleKmSettimana.toFixed(2);
-    }
-
+    if (cellKmSet) cellKmSet.innerText = totaleKmSettimana.toFixed(2);
+  
     // 4) Aggiorna la colonna Totale di ogni riga (somma delle 7 celle editabili)
     const rows = tableSpese.tBodies[0].rows;
     for (let i = 0; i < rows.length; i++) {
@@ -170,24 +170,22 @@ document.addEventListener('DOMContentLoaded', () => {
         totCell.innerText = somma.toFixed(2);
       }
     }
-
-    // 5) Aggiorna Totali dei blocchi settimanali
+  
+    // 5) Aggiorna i totali settimanali per i blocchi
     const cellSpViaggioWeek = tableSpese.querySelector(".sp-viaggio-week-tot");
     if (cellSpViaggioWeek) cellSpViaggioWeek.innerText = spViaggioWeekTot.toFixed(2);
-
+  
     const cellAlloggioWeek = tableSpese.querySelector(".alloggio-week-tot");
     if (cellAlloggioWeek) cellAlloggioWeek.innerText = alloggioWeekTot.toFixed(2);
-
+  
     const cellCarburanteWeek = tableSpese.querySelector(".carburante-week-tot");
     if (cellCarburanteWeek) cellCarburanteWeek.innerText = carburanteWeekTot.toFixed(2);
-
-    // 6) Totale Settimana (somma dei blocchi spese)
+  
+    // 6) Aggiorna la cella "TOTALE SETTIMANA" (somma di tutti i blocchi spese)
     const cellTotSettimana = tableSpese.querySelector(".totale-settimana");
-    if (cellTotSettimana) {
-      cellTotSettimana.innerText = totaleSpeseSett.toFixed(2);
-    }
+    if (cellTotSettimana) cellTotSettimana.innerText = totaleSpeseSett.toFixed(2);
   }
-
+  
   // ===============================
   // Evento su celle editabili: aggiorna speseData
   // ===============================
@@ -202,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
       aggiornaCalcoli();
     });
   });
-
+  
   // ===============================
   // Carica e Salva (LocalStorage)
   // ===============================
@@ -219,13 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const dati = JSON.parse(salvato);
-    dipInput.value = dati.dipendente || "";
-    targaInput.value = dati.targa || "";
-    noteInput.value = dati.note || "";
-    firmaDirInput.value = dati.firmaDirezione || "";
-    firmaDipInput.value = dati.firmaDipendente || "";
-    speseData = dati.speseData || {};
-
+    dipInput.value       = dati.dipendente      || "";
+    targaInput.value     = dati.targa           || "";
+    noteInput.value      = dati.note            || "";
+    firmaDirInput.value  = dati.firmaDirezione  || "";
+    firmaDipInput.value  = dati.firmaDipendente || "";
+    speseData            = dati.speseData       || {};
+  
     giorni.forEach(day => {
       if (!speseData[day]) return;
       for (const cat in speseData[day]) {
@@ -238,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     aggiornaCalcoli();
     alert(`Settimana ${sett} caricata con successo!`);
   });
-
+  
   salvaBtn.addEventListener('click', () => {
     const sett = settimanaInput.value.trim();
     if (!sett) {
@@ -257,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(key, JSON.stringify(dati));
     alert(`Settimana ${sett} salvata con successo!`);
   });
-
+  
   // ===============================
   // Funzionalità Stampa / WhatsApp
   // ===============================
@@ -276,22 +274,21 @@ document.addEventListener('DOMContentLoaded', () => {
     a.download = `nota_spese_${sett}.txt`;
     a.click();
   });
-
+  
   whatsappBtn.addEventListener('click', () => {
     const sett = settimanaInput.value.trim();
     let msg = `NOTA SPESE (Settimana ${sett})\nDipendente: ${dipInput.value}\nTarga: ${targaInput.value}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   });
-
+  
   stampaRepBtn.addEventListener('click', () => {
     window.print();
   });
-
+  
   // ===============================
-  // Funzione: Aggiorna l'intestazione in base al numero settimana
+  // Funzione: Aggiorna Intestazione in base al numero settimana
   // ===============================
   function updateHeaderDates() {
-    // Il campo settimanaInput deve avere il formato "ww/yyyy"
     const val = settimanaInput.value.trim();
     if (!val.includes("/")) return;
     const parts = val.split("/");
@@ -301,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNaN(week) || isNaN(year)) return;
     const monday = getMondayOfISOWeek(week, year);
     const headerRow = tableSpese.tHead.rows[0];
-    // Aggiorna le intestazioni per le colonne da 2 a 8 (indice 1..7)
     for (let i = 1; i <= 7; i++) {
       const dayIndex = i - 1;
       const dateObj = new Date(monday);
@@ -309,28 +305,25 @@ document.addEventListener('DOMContentLoaded', () => {
       headerRow.cells[i].innerText = giorniNomi[giorni[dayIndex]] + " (" + formatDate(dateObj) + ")";
     }
   }
-
-  // Calcola il lunedì della settimana ISO, dato week e year
+  
   function getMondayOfISOWeek(week, year) {
     const simple = new Date(year, 0, 1);
-    const dayOfWeek = simple.getDay(); // 0 = domenica
-    // Trova il primo lunedì
-    const diff = dayOfWeek === 1 ? 0 : (dayOfWeek === 0 ? 1 : (8 - dayOfWeek));
+    const dayOfWeek = simple.getDay();
+    const diff = dayOfWeek === 0 ? 1 : (dayOfWeek === 1 ? 0 : (8 - dayOfWeek));
     const firstMonday = new Date(year, 0, 1 + diff);
     const monday = new Date(firstMonday);
     monday.setDate(firstMonday.getDate() + (week - 1) * 7);
     return monday;
   }
-
-  // Formatta la data in dd/mm/yyyy
+  
   function formatDate(dateObj) {
     const dd = String(dateObj.getDate()).padStart(2, '0');
     const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
     const yyyy = dateObj.getFullYear();
     return dd + "/" + mm + "/" + yyyy;
   }
-
-  // Mappa dei nomi completi dei giorni
+  
+  // Mappa dei nomi dei giorni
   const giorniNomi = {
     lun: "Lunedì",
     mar: "Martedì",
@@ -340,13 +333,12 @@ document.addEventListener('DOMContentLoaded', () => {
     sab: "Sabato",
     dom: "Domenica"
   };
-
-  // Aggiorna l'intestazione ogni volta che cambia il campo settimana
+  
   settimanaInput.addEventListener('change', () => {
     updateHeaderDates();
   });
-
-  // All'avvio, esegue i calcoli
+  
+  // All'avvio, aggiorna intestazione e calcoli
   updateHeaderDates();
   aggiornaCalcoli();
 });
