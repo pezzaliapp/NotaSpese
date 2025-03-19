@@ -1,67 +1,99 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
-
-  <!-- Collegamento a style.css se preferisci un file separato -->
   <style>
-    body { font-family: Arial, sans-serif; margin:0; background:#f0f0f0; }
-    header { background:#1976d2; color:#fff; text-align:center; padding:1rem; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f0f0f0;
+    }
+    header {
+      background: #1976d2;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
     section {
-      background:#fff; margin:1rem auto; padding:1rem; max-width:1200px;
-      border-radius:6px; box-shadow:0 0 6px rgba(0,0,0,0.1);
+      background: #fff;
+      margin: 1rem auto;
+      padding: 1rem;
+      max-width: 1200px;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
     .riga-dati {
-      display:flex; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
-    label { font-weight:bold; min-width:max-content; }
-    input[type="text"], input[type="number"], select, textarea {
-      padding:0.3rem 0.5rem; border:1px solid #ccc; border-radius:4px;
+    label {
+      font-weight: bold;
+      min-width: max-content;
     }
-    table {
-      width:100%; border-collapse:collapse; margin-top:1rem;
+    input[type="text"], input[type="number"], textarea {
+      padding: 0.3rem 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-    table th, table td {
-      border:1px solid #ccc; padding:0.5rem; text-align:center;
+    #table-spese {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
     }
-    thead {
-      background:#eaeaea;
+    #table-spese th, #table-spese td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: center;
     }
-    tfoot tr {
-      background:#f9f9f9;
-      font-weight:bold;
+    #table-spese thead {
+      background: #eaeaea;
+    }
+    #table-spese .totale-riga {
+      font-weight: bold;
+      background: #f7f7f7;
+    }
+    #table-spese .totale-blocco {
+      font-weight: bold;
+      background: #f9f9f9;
+    }
+    #table-spese tfoot tr {
+      font-weight: bold;
+      background: #f5f5f5;
     }
     button {
-      padding:0.4rem 0.8rem; border:none; border-radius:4px; cursor:pointer;
-    }
-    #report-container {
-      margin-top:1rem; 
-      overflow-x:auto; /* se serve scroll orizzontale */
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
     #esporta-stampa {
-      display:flex; gap:0.5rem; margin-top:1rem; justify-content:center;
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      justify-content: center;
     }
   </style>
 </head>
 <body>
-
   <header>
-    <h1>Nota Spese Trasferta (stile Excel)</h1>
+    <h1>Nota Spese Trasferta</h1>
   </header>
 
-  <!-- DATI GENERALI / GESTIONE SETTIMANA -->
+  <!-- SEZIONE DATI GENERALI -->
   <section>
     <div class="riga-dati">
       <label for="dipendente">Dipendente:</label>
-      <input type="text" id="dipendente" placeholder="Nome dipendente" />
+      <input type="text" id="dipendente" placeholder="Nome Dipendente" />
 
       <label for="targa">Targa Automezzo:</label>
-      <input type="text" id="targa" placeholder="Targa automezzo" />
+      <input type="text" id="targa" placeholder="Targa Automezzo" />
 
-      <label for="numero-settimana">Settimana n.:</label>
-      <input type="number" id="numero-settimana" min="1" max="52" />
+      <label for="num-settimana">N. Settimana:</label>
+      <input type="number" id="num-settimana" min="1" max="52" />
     </div>
 
     <div class="riga-dati">
@@ -71,12 +103,11 @@
   </section>
 
   <!-- TABELLA STILE EXCEL -->
-  <section id="report-container">
-    <table id="table-excel">
+  <section>
+    <table id="table-spese">
       <thead>
-        <!-- Prima riga con i giorni + TOT -->
         <tr>
-          <th>Categoria</th>
+          <th>Categoria / Sottocategoria</th>
           <th>Lunedì</th>
           <th>Martedì</th>
           <th>Mercoledì</th>
@@ -88,7 +119,7 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Blocchi. Esempio: KM -->
+        <!-- KM -->
         <tr class="km-iniziali">
           <td>Km Iniziali</td>
           <td contenteditable="true" data-cat="kmIni" data-day="lun"></td>
@@ -98,7 +129,7 @@
           <td contenteditable="true" data-cat="kmIni" data-day="ven"></td>
           <td contenteditable="true" data-cat="kmIni" data-day="sab"></td>
           <td contenteditable="true" data-cat="kmIni" data-day="dom"></td>
-          <td class="totale-riga">0</td>
+          <td class="totale-riga km-ini-tot">0</td>
         </tr>
         <tr class="km-finali">
           <td>Km Finali</td>
@@ -109,10 +140,10 @@
           <td contenteditable="true" data-cat="kmFin" data-day="ven"></td>
           <td contenteditable="true" data-cat="kmFin" data-day="sab"></td>
           <td contenteditable="true" data-cat="kmFin" data-day="dom"></td>
-          <td class="totale-riga">0</td>
+          <td class="totale-riga km-fin-tot">0</td>
         </tr>
-        <tr class="km-diff">
-          <td>Km Giornalieri</td>
+        <tr class="km-giornalieri">
+          <td>Km giornalieri</td>
           <td data-cat="kmDiff" data-day="lun"></td>
           <td data-cat="kmDiff" data-day="mar"></td>
           <td data-cat="kmDiff" data-day="mer"></td>
@@ -120,16 +151,16 @@
           <td data-cat="kmDiff" data-day="ven"></td>
           <td data-cat="kmDiff" data-day="sab"></td>
           <td data-cat="kmDiff" data-day="dom"></td>
-          <td class="totale-riga">0</td>
+          <td class="totale-riga km-diff-tot">0</td>
         </tr>
-        <tr class="tot-km">
-          <td><strong>Totale KM</strong></td>
+        <tr>
+          <td class="totale-blocco">Totale Km Settimana</td>
           <td colspan="7"></td>
-          <td class="totale-blocco-km">0</td>
+          <td class="km-sett-tot">0</td>
         </tr>
 
-        <!-- Spese Viaggio (esempio) -->
-        <tr class="spese-parcheggi">
+        <!-- SPESE VIAGGIO -->
+        <tr>
           <td>Parcheggi</td>
           <td contenteditable="true" data-cat="parcheggi" data-day="lun"></td>
           <td contenteditable="true" data-cat="parcheggi" data-day="mar"></td>
@@ -138,48 +169,95 @@
           <td contenteditable="true" data-cat="parcheggi" data-day="ven"></td>
           <td contenteditable="true" data-cat="parcheggi" data-day="sab"></td>
           <td contenteditable="true" data-cat="parcheggi" data-day="dom"></td>
-          <td class="totale-riga">0</td>
+          <td class="totale-riga sp-viaggio-tot-parcheggi">0</td>
         </tr>
-        <!-- ... altre righe per NoleggioAuto, Taxi, etc. ... -->
-
-        <tr class="spese-viaggio-total">
-          <td><strong>Totale Spese Viaggio</strong></td>
-          <td colspan="7"></td>
-          <td class="totale-blocco-viaggio">0</td>
+        <tr>
+          <td>Noleggio Auto</td>
+          <td contenteditable="true" data-cat="noleggio" data-day="lun"></td>
+          <!-- e così via ... -->
+          <td class="totale-riga sp-viaggio-tot-noleggio">0</td>
+        </tr>
+        <tr>
+          <td>Taxi / Autobus</td>
+          <!-- 7 celle data-cat="taxiBus" data-day="lun" ... -->
+          <td class="totale-riga sp-viaggio-tot-taxibus">0</td>
+        </tr>
+        <tr>
+          <td>Biglietti Aerei/Treni</td>
+          <!-- ... -->
+          <td class="totale-riga sp-viaggio-tot-biglietti">0</td>
+        </tr>
+        <tr>
+          <td>Carburante c/contante</td>
+          <!-- ... -->
+          <td class="totale-riga sp-viaggio-tot-cbcont">0</td>
+        </tr>
+        <tr>
+          <td>Altro (Spese Viaggio)</td>
+          <!-- ... -->
+          <td class="totale-riga sp-viaggio-tot-altro">0</td>
+        </tr>
+        <tr class="sp-viaggio-subtot">
+          <td class="totale-blocco">Subtotale giornaliero Spese Viaggio</td>
+          <td data-cat="spViaggioDay" data-day="lun"></td>
+          <td data-cat="spViaggioDay" data-day="mar"></td>
+          <td data-cat="spViaggioDay" data-day="mer"></td>
+          <td data-cat="spViaggioDay" data-day="gio"></td>
+          <td data-cat="spViaggioDay" data-day="ven"></td>
+          <td data-cat="spViaggioDay" data-day="sab"></td>
+          <td data-cat="spViaggioDay" data-day="dom"></td>
+          <td class="totale-blocco sp-viaggio-total">0</td>
         </tr>
 
-        <!-- Alloggio e Pasti -->
+        <!-- ALLOGGIO E PASTI -->
         <tr>
           <td>Alloggio</td>
-          <td contenteditable="true" data-cat="alloggio" data-day="lun"></td>
+          <!-- 7 celle contenteditable data-cat="alloggio" data-day="lun"... -->
+          <td class="totale-riga alloggio-tot"></td>
+        </tr>
+        <tr>
+          <td>Colazione</td>
           <!-- ... -->
-          <td class="totale-riga">0</td>
         </tr>
-        <!-- ... Altre righe: Colazione, Pranzo, Cena, etc. ... -->
-
-        <tr class="alloggio-pasti-total">
-          <td><strong>Totale Alloggio e Pasti</strong></td>
-          <td colspan="7"></td>
-          <td class="totale-blocco-alloggio">0</td>
+        <tr>
+          <td>Pranzo</td>
+          <!-- ... -->
+        </tr>
+        <tr>
+          <td>Cena</td>
+          <!-- ... -->
+        </tr>
+        <tr>
+          <td>Acqua/Caffè</td>
+          <!-- ... -->
+        </tr>
+        <tr>
+          <td>Altro (Alloggio/Pasti)</td>
+          <!-- ... -->
+        </tr>
+        <tr class="alloggio-pasti-subtot">
+          <td class="totale-blocco">Subtotale giornaliero Alloggio/Pasti</td>
+          <td data-cat="alloggioDay" data-day="lun"></td>
+          <!-- ... -->
+          <td class="totale-blocco alloggio-total"></td>
         </tr>
 
-        <!-- Carburante -->
+        <!-- CARBURANTE c/card ENI -->
         <tr>
           <td>Carburante (Carta ENI)</td>
-          <!-- 7 celle editabili, tot riga -->
-          <td contenteditable="true" data-cat="carburanteENI" data-day="lun"></td>
-          <!-- ... -->
-          <td class="totale-riga">0</td>
+          <!-- 7 celle data-cat="carburanteENI" data-day="lun"... -->
+          <td class="totale-riga carburante-eni-tot"></td>
         </tr>
-        <tr class="carburante-total">
-          <td><strong>Totale Carburante</strong></td>
-          <td colspan="7"></td>
-          <td class="totale-blocco-carburante">0</td>
+        <tr class="carburante-subtot">
+          <td class="totale-blocco">Subtotale giornaliero Carburante ENI</td>
+          <td data-cat="carbEniDay" data-day="lun"></td>
+          <!-- ... -->
+          <td class="totale-blocco carburante-total"></td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <td><strong>TOTALE SPESE SETTIMANA</strong></td>
+          <td><strong>TOTALE SETTIMANA</strong></td>
           <td colspan="7"></td>
           <td class="totale-settimana">0</td>
         </tr>
@@ -201,7 +279,6 @@
     </div>
   </section>
 
-  <!-- PULSANTI -->
   <section id="esporta-stampa">
     <button id="stampa-txt">Stampa in TXT</button>
     <button id="condividi-whatsapp">Invia via WhatsApp</button>
