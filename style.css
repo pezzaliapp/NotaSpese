@@ -1,3 +1,5 @@
+/* style.css */
+
 /* Reset basico */
 * {
   box-sizing: border-box;
@@ -5,11 +7,11 @@
   padding: 0;
 }
 
-/* Corpo pagina con font dinamico */
+/* Corpo pagina */
 body {
   font-family: Arial, sans-serif;
   background: #f0f0f0;
-  font-size: calc(14px + 0.5vw);
+  font-size: 16px; /* Dimensione di base; puoi ridurre se vuoi un testo più piccolo */
 }
 
 /* Header */
@@ -20,10 +22,10 @@ header {
   padding: 1rem;
 }
 
-/* Sezioni centrate e adattabili */
+/* Sezioni con layout centrato */
 section {
-  max-width: 100%;
   width: 95%;
+  max-width: 1200px;
   margin: 1rem auto;
   padding: 1rem;
   background: #fff;
@@ -53,19 +55,30 @@ textarea {
   border-radius: 4px;
 }
 
-/* Tabelle stile Excel */
-table {
+/* Contenitore per la tabella: scroll orizzontale se serve */
+.table-container {
   width: 100%;
-  border-collapse: collapse;
+  overflow-x: auto; /* abilita scrollbar orizzontale */
   margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
-table th, table td {
+/* Tabella */
+table {
+  min-width: 1000px; /* assicura che tutte le colonne stiano su una riga */
+  border-collapse: collapse;
+  font-size: 0.9rem; /* font leggermente più piccolo per ridurre altezza riga */
+}
+
+/* Celle tabella */
+table th,
+table td {
   border: 1px solid #ccc;
-  padding: 0.5rem;
+  padding: 0.3rem 0.4rem; /* meno padding => righe più basse */
   text-align: center;
 }
 
+/* Intestazione */
 table thead {
   background: #eaeaea;
 }
@@ -105,6 +118,7 @@ button {
   cursor: pointer;
 }
 
+/* Contenitore dei pulsanti */
 #esporta-stampa {
   display: flex;
   gap: 0.5rem;
@@ -112,9 +126,14 @@ button {
   justify-content: center;
 }
 
-/* Media query per dispositivi piccoli */
+/* Media query per schermi più piccoli */
 @media (max-width: 768px) {
-  body {
-    font-size: 14px;
+  table {
+    font-size: 0.8rem;
+    min-width: 900px; /* riduci se preferisci meno scroll */
+  }
+  table th,
+  table td {
+    padding: 0.2rem 0.3rem;
   }
 }
