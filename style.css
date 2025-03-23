@@ -1,1 +1,174 @@
-/* style.css */ body { font-family: Arial; }
+/* style.css */
+ 
+ /* Reset basico */
+ * {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+ }
+ 
+ /* Corpo pagina */
+ body {
+   font-family: Arial, sans-serif;
+   background: #f0f0f0;
+   font-size: 14px; /* Dimensione base per una buona leggibilità */
+ }
+ 
+ /* Header */
+ header {
+   background: #1976d2;
+   color: #fff;
+   text-align: center;
+   padding: 1rem;
+ }
+ 
+ /* Sezioni */
+ section {
+   width: 95%;
+   max-width: 1200px;
+   margin: 1rem auto;
+   padding: 1rem;
+   background: #fff;
+   border-radius: 6px;
+   box-shadow: 0 0 6px rgba(0,0,0,0.1);
+ }
+ 
+ /* Righe di dati (campi input, etc.) */
+ .riga-dati {
+   display: flex;
+   gap: 1rem;
+   margin-bottom: 1rem;
+   flex-wrap: wrap;
+ }
+ 
+ /* Label e input */
+ label {
+   font-weight: bold;
+   min-width: max-content;
+ }
+ 
+ input[type="text"],
+ input[type="number"],
+ textarea {
+   padding: 0.3rem 0.5rem;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+ }
+ 
+ /* Contenitore per la tabella */
+ .table-container {
+   width: 100%;
+   margin-top: 1rem;
+   margin-bottom: 1rem;
+ }
+ 
+ /* Tabella con layout fisso (niente scroll orizzontale) */
+ table {
+   width: 100%;               /* La tabella riempie tutto lo spazio */
+   table-layout: fixed;       /* Le colonne hanno larghezza fissa */
+   border-collapse: collapse;
+   font-size: 0.8rem;         /* Font un po' più piccolo */
+ }
+ 
+ /* Assegna percentuali di larghezza alle 9 colonne:
+    - 1° colonna (Categoria): 20%
+    - Colonne da 2 a 8 (Lunedì-Domenica): 10% ciascuna
+    - 9° colonna (Totale): 10%
+ */
+ table th:nth-child(1),
+ table td:nth-child(1) {
+   width: 20%;
+ }
+ table th:nth-child(2),
+ table td:nth-child(2),
+ table th:nth-child(3),
+ table td:nth-child(3),
+ table th:nth-child(4),
+ table td:nth-child(4),
+ table th:nth-child(5),
+ table td:nth-child(5),
+ table th:nth-child(6),
+ table td:nth-child(6),
+ table th:nth-child(7),
+ table td:nth-child(7),
+ table th:nth-child(8),
+ table td:nth-child(8) {
+   width: 10%;
+ }
+ table th:nth-child(9),
+ table td:nth-child(9) {
+   width: 10%;
+ }
+ 
+ /* Celle tabella */
+ table th,
+ table td {
+   border: 1px solid #ccc;
+   padding: 0.3rem 0.4rem;
+   text-align: center;
+   white-space: normal;
+   word-wrap: break-word;
+ }
+ 
+ /* Intestazione della tabella */
+ table thead {
+   background: #eaeaea;
+ }
+ 
+ /* SUBTOTALI (gradiente orizzontale, colore più chiaro) */
+ table .sp-viaggio-subtot,
+ table .alloggio-pasti-subtot,
+ table .carburante-subtot {
+   background: linear-gradient(to right, #cce4f7, #b2d8f7);
+   color: #000;
+   font-weight: bold;
+ }
+ 
+ /* RIGHE TOTALI (gradiente verticale, colore più scuro) */
+ table .totale-riga {
+   background: linear-gradient(to bottom, #a9a9a9, #888888);
+   color: #fff;
+   font-weight: bold;
+ }
+ 
+ /* Se usi anche .totale-blocco o vuoi estendere al tfoot, puoi unire:
+ table .totale-riga,
+ table .totale-blocco,
+ table tfoot tr {
+   background: linear-gradient(to bottom, #a9a9a9, #888888);
+   color: #fff;
+   font-weight: bold;
+ }
+ */
+ 
+ /* Pulsanti */
+ button {
+   padding: 0.4rem 0.8rem;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+ }
+ 
+ /* Contenitore dei pulsanti */
+ #esporta-stampa {
+   display: flex;
+   gap: 0.5rem;
+   margin-top: 1rem;
+   justify-content: center;
+ }
+ 
+ /* Stampa: riduci ulteriormente il font per far entrare tutto in pagina */
+ @media print {
+   body {
+     font-size: 10px;
+   }
+ 
+ #upload-sezione img {
+   border: 1px solid #ccc;
+   border-radius: 4px;
+ }
+   
+   table {
+     font-size: 9px;
+   }
+ }/* style.css */ body { font-family: Arial; }
