@@ -284,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.print();
   });
 
+// =============== GESTIONE IMMAGINI ===============
 const fileInput = document.getElementById('file-input');
 const zipBtn = document.getElementById('zip-btn');
 const settimanaImgInput = document.getElementById('settimana-immagini');
@@ -291,15 +292,31 @@ const previewContainer = document.getElementById('preview-immagini');
 let immaginiSelezionate = [];
 
 fileInput.addEventListener('change', (event) => {
-  immaginiSelezionate = Array.from(event.target.files);
-  previewContainer.innerHTML = ''; // reset
-  immaginiSelezate.forEach(file => {
+  const nuoveImmagini = Array.from(event.target.files);
+
+  // Aggiungile a quelle già selezionate
+  immaginiSelezionate.push(...nuoveImmagini);
+
+  // Mostra tutte le immagini sotto
+  previewContainer.innerHTML = '';
+  immaginiSelezionate.forEach((file, index) => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+
     const img = document.createElement('img');
     img.src = URL.createObjectURL(file);
     img.style.maxWidth = '100px';
     img.style.maxHeight = '100px';
     img.title = file.name;
-    previewContainer.appendChild(img);
+
+    const caption = document.createElement('small');
+    caption.textContent = file.name;
+
+    container.appendChild(img);
+    container.appendChild(caption);
+    previewContainer.appendChild(container);
   });
 });
 
@@ -318,7 +335,7 @@ zipBtn.addEventListener('click', async () => {
   const zip = new JSZip();
   const cartella = zip.folder(`NotaSpese_${settimana}`);
 
-  for (const file of immaginiSelezate) {
+  for (const file of immaginiSelezionate) {
     const arrayBuffer = await file.arrayBuffer();
     cartella.file(file.name, arrayBuffer);
   }
@@ -332,11 +349,10 @@ zipBtn.addEventListener('click', async () => {
 
   setTimeout(() => {
     if (confirm("Vuoi inviarlo anche via WhatsApp?")) {
-      alert("Condividi manualmente il file ZIP appena scaricato tramite WhatsApp Web o App.");
+      alert("Condividi il file ZIP appena scaricato tramite WhatsApp Web o App.");
     }
-  }, 1000);
-});
-  
+  }, 500);
+});  
   // All'avvio
   aggiornaCalcoli();
 });
