@@ -162,6 +162,12 @@ button {
   body {
     font-size: 10px;
   }
+
+#upload-sezione img {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+  
   table {
     font-size: 9px;
   }
