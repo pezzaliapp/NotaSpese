@@ -284,60 +284,105 @@ document.addEventListener('DOMContentLoaded', () => {
     window.print();
   });
 
-// =============== GESTIONE IMMAGINI ===============
+// =============== GESTIONE IMMAGINI CON ANTEPRIMA, RIMOZIONE E STORAGE ===============
 const fileInput = document.getElementById('file-input');
 const zipBtn = document.getElementById('zip-btn');
 const settimanaImgInput = document.getElementById('settimana-immagini');
 const previewContainer = document.getElementById('preview-immagini');
+
 let immaginiSelezionate = [];
 
-fileInput.addEventListener('change', (event) => {
-  const nuoveImmagini = Array.from(event.target.files);
-
-  // Aggiungile a quelle già selezionate
-  immaginiSelezionate.push(...nuoveImmagini);
-
-  // Mostra tutte le immagini sotto
+// Funzione per aggiornare l'anteprima immagini
+function aggiornaPreview() {
   previewContainer.innerHTML = '';
-  immaginiSelezionate.forEach((file, index) => {
+  immaginiSelezionate.forEach((imgObj, index) => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
+    container.style.margin = '5px';
 
     const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
+    img.src = imgObj.base64;
     img.style.maxWidth = '100px';
     img.style.maxHeight = '100px';
-    img.title = file.name;
+    img.title = imgObj.nome;
 
     const caption = document.createElement('small');
-    caption.textContent = file.name;
+    caption.innerText = `${imgObj.nome} (${imgObj.settimana})`;
+
+    const dataText = document.createElement('small');
+    dataText.innerText = imgObj.data;
+
+    const delBtn = document.createElement('button');
+    delBtn.innerText = "❌";
+    delBtn.style.marginTop = "5px";
+    delBtn.onclick = () => {
+      immaginiSelezionate.splice(index, 1);
+      aggiornaPreview();
+      salvaImmaginiStorage(imgObj.settimana);
+    };
 
     container.appendChild(img);
     container.appendChild(caption);
+    container.appendChild(dataText);
+    container.appendChild(delBtn);
     previewContainer.appendChild(container);
+  });
+}
+
+// Salva immagini per settimana in localStorage
+function salvaImmaginiStorage(settimana) {
+  const key = `NotaSpeseImmagini_${settimana.replace('/', '_')}`;
+  localStorage.setItem(key, JSON.stringify(immaginiSelezionate));
+}
+
+// Carica immagini da localStorage se esistono
+function caricaImmaginiStorage(settimana) {
+  const key = `NotaSpeseImmagini_${settimana.replace('/', '_')}`;
+  const salvate = localStorage.getItem(key);
+  immaginiSelezionate = salvate ? JSON.parse(salvate) : [];
+  aggiornaPreview();
+}
+
+fileInput.addEventListener('change', (event) => {
+  const settimana = settimanaImgInput.value.trim();
+  if (!settimana) {
+    alert("Inserisci prima la settimana (es. 17/2025).");
+    return;
+  }
+
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result;
+      immaginiSelezionate.push({
+        nome: file.name,
+        settimana: settimana,
+        data: new Date().toLocaleString(),
+        base64: base64
+      });
+      aggiornaPreview();
+      salvaImmaginiStorage(settimana);
+    };
+    reader.readAsDataURL(file);
   });
 });
 
 zipBtn.addEventListener('click', async () => {
   if (immaginiSelezionate.length === 0) {
-    alert("Seleziona almeno un'immagine.");
+    alert("Nessuna immagine da comprimere.");
     return;
   }
 
   const settimana = settimanaImgInput.value.trim().replace('/', '_');
-  if (!settimana) {
-    alert("Inserisci la settimana (es. 11/2025).");
-    return;
-  }
-
   const zip = new JSZip();
   const cartella = zip.folder(`NotaSpese_${settimana}`);
 
-  for (const file of immaginiSelezionate) {
-    const arrayBuffer = await file.arrayBuffer();
-    cartella.file(file.name, arrayBuffer);
+  for (const img of immaginiSelezionate) {
+    const base64data = img.base64.split(',')[1]; // rimuove "data:image/png;base64,"
+    cartella.file(img.nome, base64ToBlob(base64data));
   }
 
   const content = await zip.generateAsync({ type: 'blob' });
@@ -349,10 +394,27 @@ zipBtn.addEventListener('click', async () => {
 
   setTimeout(() => {
     if (confirm("Vuoi inviarlo anche via WhatsApp?")) {
-      alert("Condividi il file ZIP appena scaricato tramite WhatsApp Web o App.");
+      alert("Condividi manualmente il file ZIP appena scaricato.");
     }
   }, 500);
-});  
+});
+
+// Funzione per convertire base64 in Blob
+function base64ToBlob(base64) {
+  const binary = atob(base64);
+  const array = [];
+  for (let i = 0; i < binary.length; i++) {
+    array.push(binary.charCodeAt(i));
+  }
+  return new Blob([new Uint8Array(array)]);
+}
+
+// Se inserisci la settimana, carica immagini da localStorage
+settimanaImgInput.addEventListener('input', () => {
+  if (settimanaImgInput.value.trim()) {
+    caricaImmaginiStorage(settimanaImgInput.value.trim());
+  }
+});
   // All'avvio
   aggiornaCalcoli();
 });
