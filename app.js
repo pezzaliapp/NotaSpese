@@ -241,32 +241,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // ========================
   // Stampa in TXT
   // ========================
-  stampaTxtBtn.addEventListener('click', () => {
-    const sett = settimanaInput.value;
-    let testo = `NOTA SPESE TRASFERTA - Settimana ${sett}\n\n`;
-    testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
-    giorni.forEach(day => {
-      testo += `${day.toUpperCase()}: ${JSON.stringify(speseData[day])}\n`;
-    });
-    testo += `\nNote: ${noteInput.value}\n`;
-    testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
+ // stampaTxtBtn.addEventListener('click', () => {
+  //  const sett = settimanaInput.value;
+ //   let testo = `NOTA SPESE TRASFERTA - Settimana ${sett}\n\n`;
+ //   testo += `Dipendente: ${dipInput.value}\nTarga: ${targaInput.value}\n\n`;
+ //   giorni.forEach(day => {
+ //     testo += `${day.toUpperCase()}: ${JSON.stringify(speseData[day])}\n`;
+ //   });
+ //   testo += `\nNote: ${noteInput.value}\n`;
+ //   testo += `Visto Direzione: ${firmaDirInput.value}\nFirma Dipendente: ${firmaDipInput.value}\n`;
 
-    const blob = new Blob([testo], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nota_spese_${sett}.txt`;
-    a.click();
-  });
+ //   const blob = new Blob([testo], { type: 'text/plain' });
+ //   const url = URL.createObjectURL(blob);
+ //   const a = document.createElement('a');
+ //   a.href = url;
+ //   a.download = `nota_spese_${sett}.txt`;
+ //   a.click();
+ // });
 
   // ========================
   // Invia via WhatsApp
   // ========================
-  whatsappBtn.addEventListener('click', () => {
-    const sett = settimanaInput.value;
-    let msg = `NOTA SPESE (Settimana ${sett})\nDipendente: ${dipInput.value}\nTarga: ${targaInput.value}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-  });
+ // whatsappBtn.addEventListener('click', () => {
+ //   const sett = settimanaInput.value;
+ //   let msg = `NOTA SPESE (Settimana ${sett})\nDipendente: ${dipInput.value}\nTarga: ${targaInput.value}`;
+ //   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+ // }); 
 
   // ========================
   // Stampa Replica Form
