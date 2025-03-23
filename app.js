@@ -275,6 +275,96 @@ document.addEventListener('DOMContentLoaded', () => {
     window.print();
   });
 
+  // ========================
+  // Gestione caricamento immagini e generazione ZIP
+  // ========================
+  const fileInput = document.getElementById('file-input');
+  const fotoBtn = document.getElementById('foto-btn');
+  const zipBtn = document.getElementById('zip-btn');
+  const previewContainer = document.getElementById('preview-immagini');
+  let imagesArray = []; // Array per memorizzare gli oggetti File delle immagini
+
+  // Quando si clicca sul bottone per caricare le foto, attiva il file input
+  fotoBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  // Gestione del caricamento file
+  fileInput.addEventListener('change', (event) => {
+    const files = event.target.files;
+    for (let file of files) {
+      // Usa FileReader per creare la preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // Crea un contenitore per l'immagine e il pulsante di eliminazione
+        const imgContainer = document.createElement('div');
+        imgContainer.style.position = 'relative';
+        imgContainer.style.display = 'inline-block';
+
+        // Crea l'elemento immagine
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '150px';
+        img.style.maxHeight = '150px';
+        img.style.display = 'block';
+
+        // Crea il pulsante per eliminare l'immagine
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'X';
+        delBtn.style.position = 'absolute';
+        delBtn.style.top = '0';
+        delBtn.style.right = '0';
+        delBtn.style.backgroundColor = 'red';
+        delBtn.style.color = 'white';
+        delBtn.style.border = 'none';
+        delBtn.style.cursor = 'pointer';
+
+        // Evento per eliminare l'immagine dal preview e dall'array
+        delBtn.addEventListener('click', () => {
+          previewContainer.removeChild(imgContainer);
+          imagesArray = imagesArray.filter(f => f !== file);
+        });
+
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(delBtn);
+        previewContainer.appendChild(imgContainer);
+      }
+      reader.readAsDataURL(file);
+      // Aggiunge il file all'array delle immagini
+      imagesArray.push(file);
+    }
+    // Resetta il file input per poter ricaricare anche file già selezionati in futuro
+    fileInput.value = "";
+  });
+
+  // Gestione della generazione dello ZIP
+  zipBtn.addEventListener('click', async () => {
+    if (imagesArray.length === 0) {
+      alert("Nessuna foto caricata!");
+      return;
+    }
+    
+    const zip = new JSZip();
+    // Ottieni il valore del campo "Settimana (es. 11/2025)"
+    const settimanaImmagini = document.getElementById('settimana-immagini').value.trim();
+    // Imposta il nome del file ZIP includendo il numero di settimana, se presente
+    let zipFileName = settimanaImmagini ? `Settimana_${settimanaImmagini}.zip` : "immagini.zip";
+
+    // Aggiunge ogni immagine allo ZIP
+    for (let file of imagesArray) {
+      const arrayBuffer = await file.arrayBuffer();
+      zip.file(file.name, arrayBuffer);
+    }
+
+    // Genera il file ZIP e attiva il download
+    zip.generateAsync({type:"blob"}).then(function(content) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(content);
+      a.download = zipFileName;
+      a.click();
+    });
+  });
+  
   // All'avvio
   aggiornaCalcoli();
 });
