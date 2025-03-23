@@ -366,14 +366,18 @@
 <!-- SEZIONE FOTO/IMMAGINI -->
 <section id="upload-sezione">
   <h2>Allegati Spese (Scontrini / Foto)</h2>
+
   <div class="riga-dati">
     <label for="settimana-immagini">Settimana (es. 11/2025):</label>
     <input type="text" id="settimana-immagini" placeholder="es. 11/2025" />
   </div>
+
   <div class="riga-dati">
-    <input type="file" id="file-input" accept="image/*" multiple capture="environment"/>
-    <button id="zip-btn">Crea ZIP e Condividi</button>
+    <input type="file" id="file-input" accept="image/*" style="display:none" />
+    <button id="foto-btn" type="button">📷 Scatta o Carica Foto</button>
+    <button id="zip-btn" type="button">Crea ZIP e Condividi</button>
   </div>
+
   <div id="preview-immagini" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;"></div>
 </section>
 
