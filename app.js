@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const stampaRepBtn   = document.getElementById('stampa-replica');
 
   const tableSpese     = document.getElementById('table-spese');
+  const fileInput = document.getElementById('file-input');
+const fotoBtn = document.getElementById('foto-btn');
+const zipBtn = document.getElementById('zip-btn');
+const settimanaImgInput = document.getElementById('settimana-immagini');
+const previewContainer = document.getElementById('preview-immagini');
 
   // Oggetto per memorizzare i dati
   let speseData = {
