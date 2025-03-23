@@ -392,13 +392,12 @@ zipBtn.addEventListener('click', async () => {
   a.download = `NotaSpese_${settimana}.zip`;
   a.click();
 
-  setTimeout(() => {
-    if (confirm("Vuoi inviarlo anche via WhatsApp?")) {
-      alert("Condividi manualmente il file ZIP appena scaricato.");
-    }
-  }, 500);
+  // Messaggio WhatsApp copiato negli appunti
+  const messaggio = `Ho compilato la nota spese della settimana ${settimana.replace('_', '/')}.\nIn allegato il file ZIP con gli scontrini.`;
+  navigator.clipboard.writeText(messaggio).then(() => {
+    alert("📁 Il file ZIP è stato scaricato.\n\n🔗 Ora apri WhatsApp, seleziona il contatto e allega manualmente il file ZIP appena salvato.\n\n✅ Il messaggio è stato copiato negli appunti. Ti basta incollarlo nella chat.");
+  });
 });
-
 // Funzione per convertire base64 in Blob
 function base64ToBlob(base64) {
   const binary = atob(base64);
