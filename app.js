@@ -371,7 +371,7 @@ fileInput.addEventListener('change', (event) => {
 });
 
 zipBtn.addEventListener('click', async () => {
-  if (immaginiSelezate.length === 0) {
+  if (immaginiSelezionate.length === 0) {
     alert("Nessuna immagine da comprimere.");
     return;
   }
@@ -380,7 +380,7 @@ zipBtn.addEventListener('click', async () => {
   const zip = new JSZip();
   const cartella = zip.folder(`NotaSpese_${settimana}`);
 
-  for (const img of immaginiSelezate) {
+  for (const img of immaginiSelezionate) {
     const base64data = img.base64.split(',')[1]; // rimuove "data:image/png;base64,"
     cartella.file(img.nome, base64ToBlob(base64data));
   }
