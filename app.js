@@ -371,7 +371,7 @@ fileInput.addEventListener('change', (event) => {
 });
 
 zipBtn.addEventListener('click', async () => {
-  if (immaginiSelezionate.length === 0) {
+  if (immaginiSelezate.length === 0) {
     alert("Nessuna immagine da comprimere.");
     return;
   }
@@ -380,7 +380,7 @@ zipBtn.addEventListener('click', async () => {
   const zip = new JSZip();
   const cartella = zip.folder(`NotaSpese_${settimana}`);
 
-  for (const img of immaginiSelezionate) {
+  for (const img of immaginiSelezate) {
     const base64data = img.base64.split(',')[1]; // rimuove "data:image/png;base64,"
     cartella.file(img.nome, base64ToBlob(base64data));
   }
@@ -390,14 +390,19 @@ zipBtn.addEventListener('click', async () => {
   const a = document.createElement('a');
   a.href = url;
   a.download = `NotaSpese_${settimana}.zip`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 
-  // Messaggio WhatsApp copiato negli appunti
-  const messaggio = `Ho compilato la nota spese della settimana ${settimana.replace('_', '/')}.\nIn allegato il file ZIP con gli scontrini.`;
-  navigator.clipboard.writeText(messaggio).then(() => {
-    alert("📁 Il file ZIP è stato scaricato.\n\n🔗 Ora apri WhatsApp, seleziona il contatto e allega manualmente il file ZIP appena salvato.\n\n✅ Il messaggio è stato copiato negli appunti. Ti basta incollarlo nella chat.");
-  });
+  // Attendi 1 secondo per sicurezza
+  setTimeout(() => {
+    const messaggio = `Ho compilato la nota spese della settimana ${settimana.replace('_', '/')}.\nIn allegato il file ZIP con gli scontrini.`;
+    navigator.clipboard.writeText(messaggio).then(() => {
+      alert("📁 Il file ZIP è stato scaricato.\n\n🔗 Ora apri WhatsApp, seleziona il contatto e allega manualmente il file ZIP appena salvato.\n\n✅ Il messaggio è stato copiato negli appunti. Ti basta incollarlo nella chat.");
+    });
+  }, 1000);
 });
+
 // Funzione per convertire base64 in Blob
 function base64ToBlob(base64) {
   const binary = atob(base64);
