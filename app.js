@@ -289,15 +289,15 @@ const previewContainer = document.getElementById('preview-immagini');
     window.print();
   });
 
-// =============== GESTIONE IMMAGINI CON ANTEPRIMA, RIMOZIONE E STORAGE ===============
+// =============== SEZIONE IMMAGINI ===============
 const fileInput = document.getElementById('file-input');
+const fotoBtn = document.getElementById('foto-btn');
 const zipBtn = document.getElementById('zip-btn');
 const settimanaImgInput = document.getElementById('settimana-immagini');
 const previewContainer = document.getElementById('preview-immagini');
-
 let immaginiSelezionate = [];
 
-// Funzione per aggiornare l'anteprima immagini
+// Visualizza le immagini nella preview con nome, data e rimuovi
 function aggiornaPreview() {
   previewContainer.innerHTML = '';
   immaginiSelezionate.forEach((imgObj, index) => {
@@ -336,13 +336,13 @@ function aggiornaPreview() {
   });
 }
 
-// Salva immagini per settimana in localStorage
+// Salvataggio immagini su localStorage
 function salvaImmaginiStorage(settimana) {
   const key = `NotaSpeseImmagini_${settimana.replace('/', '_')}`;
   localStorage.setItem(key, JSON.stringify(immaginiSelezionate));
 }
 
-// Carica immagini da localStorage se esistono
+// Caricamento immagini da localStorage
 function caricaImmaginiStorage(settimana) {
   const key = `NotaSpeseImmagini_${settimana.replace('/', '_')}`;
   const salvate = localStorage.getItem(key);
@@ -350,6 +350,13 @@ function caricaImmaginiStorage(settimana) {
   aggiornaPreview();
 }
 
+// Pulsante "Scatta o Carica Foto"
+fotoBtn.addEventListener('click', () => {
+  fileInput.value = ''; // reset per permettere nuovo scatto
+  fileInput.click();    // apre fotocamera o file
+});
+
+// Quando vengono caricate immagini
 fileInput.addEventListener('change', (event) => {
   const settimana = settimanaImgInput.value.trim();
   if (!settimana) {
@@ -375,6 +382,7 @@ fileInput.addEventListener('change', (event) => {
   });
 });
 
+// Crea ZIP e copia messaggio WhatsApp
 zipBtn.addEventListener('click', async () => {
   if (immaginiSelezionate.length === 0) {
     alert("Nessuna immagine da comprimere.");
@@ -386,7 +394,7 @@ zipBtn.addEventListener('click', async () => {
   const cartella = zip.folder(`NotaSpese_${settimana}`);
 
   for (const img of immaginiSelezionate) {
-    const base64data = img.base64.split(',')[1]; // rimuove "data:image/png;base64,"
+    const base64data = img.base64.split(',')[1]; // togli intestazione base64
     cartella.file(img.nome, base64ToBlob(base64data));
   }
 
@@ -399,7 +407,7 @@ zipBtn.addEventListener('click', async () => {
   a.click();
   document.body.removeChild(a);
 
-  // Attendi 1 secondo per sicurezza
+  // Messaggio WhatsApp negli appunti
   setTimeout(() => {
     const messaggio = `Ho compilato la nota spese della settimana ${settimana.replace('_', '/')}.\nIn allegato il file ZIP con gli scontrini.`;
     navigator.clipboard.writeText(messaggio).then(() => {
@@ -408,7 +416,7 @@ zipBtn.addEventListener('click', async () => {
   }, 1000);
 });
 
-// Funzione per convertire base64 in Blob
+// Funzione di supporto per convertire base64 in Blob
 function base64ToBlob(base64) {
   const binary = atob(base64);
   const array = [];
@@ -418,12 +426,13 @@ function base64ToBlob(base64) {
   return new Blob([new Uint8Array(array)]);
 }
 
-// Se inserisci la settimana, carica immagini da localStorage
+// Ricarica immagini da localStorage se settimana cambia
 settimanaImgInput.addEventListener('input', () => {
   if (settimanaImgInput.value.trim()) {
     caricaImmaginiStorage(settimanaImgInput.value.trim());
   }
 });
+  
   // All'avvio
   aggiornaCalcoli();
 });
