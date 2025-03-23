@@ -284,6 +284,59 @@ document.addEventListener('DOMContentLoaded', () => {
     window.print();
   });
 
+const fileInput = document.getElementById('file-input');
+const zipBtn = document.getElementById('zip-btn');
+const settimanaImgInput = document.getElementById('settimana-immagini');
+const previewContainer = document.getElementById('preview-immagini');
+let immaginiSelezionate = [];
+
+fileInput.addEventListener('change', (event) => {
+  immaginiSelezionate = Array.from(event.target.files);
+  previewContainer.innerHTML = ''; // reset
+  immaginiSelezate.forEach(file => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.style.maxWidth = '100px';
+    img.style.maxHeight = '100px';
+    img.title = file.name;
+    previewContainer.appendChild(img);
+  });
+});
+
+zipBtn.addEventListener('click', async () => {
+  if (immaginiSelezionate.length === 0) {
+    alert("Seleziona almeno un'immagine.");
+    return;
+  }
+
+  const settimana = settimanaImgInput.value.trim().replace('/', '_');
+  if (!settimana) {
+    alert("Inserisci la settimana (es. 11/2025).");
+    return;
+  }
+
+  const zip = new JSZip();
+  const cartella = zip.folder(`NotaSpese_${settimana}`);
+
+  for (const file of immaginiSelezate) {
+    const arrayBuffer = await file.arrayBuffer();
+    cartella.file(file.name, arrayBuffer);
+  }
+
+  const content = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(content);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `NotaSpese_${settimana}.zip`;
+  a.click();
+
+  setTimeout(() => {
+    if (confirm("Vuoi inviarlo anche via WhatsApp?")) {
+      alert("Condividi manualmente il file ZIP appena scaricato tramite WhatsApp Web o App.");
+    }
+  }, 1000);
+});
+  
   // All'avvio
   aggiornaCalcoli();
 });
