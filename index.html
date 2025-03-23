@@ -5,18 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nota Spese Trasferta</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
 </head>
 <body>
-  <h1>Nota Spese - Test ZIP + Immagini</h1>
+  <header>
+    <h1>Nota Spese Trasferta</h1>
+  </header>
 
-  <input type="file" id="file-input" accept="image/*" multiple style="display:none" />
-  <button id="foto-btn">📷 Scatta o Carica Foto</button>
-  <button id="zip-btn">🗜 Crea ZIP e Condividi</button>
-  <button id="email-btn">✉️ Invia via Email</button>
+  <!-- DATI GENERALI -->
+  <section>
+    <div class="riga-dati">
+      <label for="dipendente">Dipendente:</label>
+      <input type="text" id="dipendente" placeholder="Nome Dipendente" />
+      <label for="targa">Targa Automezzo:</label>
+      <input type="text" id="targa" placeholder="Targa Automezzo" />
+    </div>
+    <div class="riga-dati">
+      <label for="num-settimana">N. Settimana:</label>
+      <input type="number" id="num-settimana" min="1" max="52" />
+      <label for="anno">Anno:</label>
+      <input type="number" id="anno" placeholder="Anno" />
+    </div>
+    <div class="riga-dati">
+      <button id="carica-settimana">Carica Settimana</button>
+      <button id="salva-settimana">Salva Settimana</button>
+    </div>
+  </section>
 
-  <div id="preview-immagini" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;"></div>
+  <!-- Contenitore tabella (semplificato per esempio) -->
+  <section>
+    <div class="table-container">
+      <table id="table-spese">
+        <thead>
+          <tr id="date-row">
+            <th></th>
+            <th>--</th><th>--</th><th>--</th><th>--</th>
+            <th>--</th><th>--</th><th>--</th><th></th>
+          </tr>
+          <tr id="days-row">
+            <th>Categoria</th>
+            <th>Lunedì</th><th>Martedì</th><th>Mercoledì</th>
+            <th>Giovedì</th><th>Venerdì</th><th>Sabato</th>
+            <th>Domenica</th><th>Totale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Km Iniziali</td>
+            <td contenteditable="true" data-cat="kmIni" data-day="lun"></td>
+            <td contenteditable="true" data-cat="kmIni" data-day="mar"></td>
+            <td contenteditable="true" data-cat="kmIni" data-day="mer"></td>
+            <td contenteditable="true" data-cat="kmIni" data-day="gio"></td>
+            <td contenteditable="true" data-cat="kmIni" data-day="ven"></td>
+            <td contenteditable="true" data-cat="kmIni" data-day="sab"></td>
+            <td contenteditable="true" data-cat="kmIni" data-day="dom"></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- NOTE E FIRME -->
+  <section>
+    <div class="riga-dati">
+      <label for="note">Note:</label>
+      <textarea id="note" rows="3" style="flex:1;"></textarea>
+    </div>
+    <div class="riga-dati">
+      <label for="firma-direzione">Visto Direzione:</label>
+      <input type="text" id="firma-direzione" placeholder="Firma Direzione" />
+      <label for="firma-dipendente">Firma Dipendente:</label>
+      <input type="text" id="firma-dipendente" placeholder="Firma Dipendente" />
+    </div>
+  </section>
+
+  <!-- PULSANTI -->
+  <section id="esporta-stampa">
+    <button id="stampa-txt">Stampa in TXT</button>
+    <button id="condividi-whatsapp">Invia via WhatsApp</button>
+    <button id="stampa-replica">Stampa Replica Form</button>
+  </section>
+
+  <!-- FOTO / ALLEGATI -->
+  <section id="upload-sezione">
+    <h2>Allegati Spese (Scontrini / Foto)</h2>
+    <div class="riga-dati">
+      <input type="file" id="file-input" accept="image/*" multiple style="display:none" />
+      <button id="foto-btn" type="button">📷 Scatta o Carica Foto</button>
+      <button id="zip-btn" type="button">Crea ZIP e Condividi</button>
+    </div>
+    <div id="preview-immagini" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;"></div>
+  </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>
